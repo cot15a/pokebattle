@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ポケバトル">
+<meta name="theme-color" content="#ffffff">
+<title>ポケバトル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --font: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --bg:  #ffffff;
+  --bg2: #f5f5f7;
+  --bg3: #f2f2f7;
+  --sep: rgba(60,60,67,0.12);
+  --sep-o: #c6c6c8;
+  --label:  #1d1d1f;
+  --label2: #6e6e73;
+  --label3: #aeaeb2;
+  --label4: #c7c7cc;
+  --blue:   #0071e3;
+  --blue-d: #005ecb;
+  --blue-l: rgba(0,113,227,0.08);
+  --green: #34c759;
+  --red:   #ff3b30;
+  --orange: #ff9500;
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px;
+  --sh-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --sh-md: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --sh-lg: 0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05);
+  --safe-top: env(safe-area-inset-top);
+  --safe-bot: env(safe-area-inset-bottom);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+.hidden { display: none !important; }
+html, body { height: 100%; font-family: var(--font); background: var(--bg3); -webkit-font-smoothing: antialiased; overscroll-behavior: none; }
+
+#app { height: 100vh; height: -webkit-fill-available; display: flex; flex-direction: column; max-width: 560px; margin: 0 auto; background: var(--bg3); }
+#app-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; overflow-x: hidden; padding-bottom: 80px; }
+#app-body::-webkit-scrollbar { width: 4px; }
+#app-body::-webkit-scrollbar-thumb { background: var(--sep); border-radius: 4px; }
+
+.apple-hdr {
+  height: calc(52px + var(--safe-top)); padding-top: var(--safe-top);
+  display: flex; align-items: center; justify-content: space-between;
+  padding-left: 20px; padding-right: 20px;
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--sep);
+  position: sticky; top: 0; z-index: 50; flex-shrink: 0;
+}
+.hdr-left { display: flex; align-items: center; gap: 10px; }
+.hdr-icon { width: 28px; height: 28px; border-radius: 7px; background: var(--blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.hdr-app-name { font-size: 13px; font-weight: 600; color: var(--label); letter-spacing: -0.01em; }
+.hdr-sub { font-size: 10px; color: var(--label2); }
+.btn-link { background: none; border: none; font-size: 13px; color: var(--blue); cursor: pointer; transition: opacity .15s; padding: 4px; font-family: var(--font); }
+.btn-link:hover { opacity: 0.7; }
+
+.tab-bar {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 560px;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-top: 1px solid var(--sep); display: flex; padding-bottom: var(--safe-bot); z-index: 50;
+}
+.tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 0 6px; cursor: pointer; transition: opacity .15s; border: none; background: none; }
+.tab-item:active { opacity: 0.5; }
+.tab-label { font-size: 10px; font-weight: 500; color: var(--label3); }
+.tab-item.active .tab-label { color: var(--blue); font-weight: 600; }
+.tab-item svg { color: var(--label3); transition: color .15s; }
+.tab-item.active svg { color: var(--blue); }
+
+.content-wrap { padding: 20px 16px 0; }
+.grp-label { font-size: 11px; font-weight: 600; color: var(--label2); letter-spacing: 0.04em; text-transform: uppercase; padding: 0 4px; margin: 20px 0 6px; }
+.grp-label:first-child { margin-top: 4px; }
+
+.apple-card { background: var(--bg); border: 1px solid var(--sep); border-radius: var(--r-lg); padding: 16px; margin-bottom: 8px; box-shadow: var(--sh-sm); }
+
+.apple-input { width: 100%; padding: 13px 15px; border-radius: var(--r-md); background: var(--bg3); border: 1px solid var(--sep); color: var(--label); font-family: var(--font); font-size: 14px; outline: none; margin-bottom: 10px; transition: border-color .2s, background .2s; -webkit-appearance: none; appearance: none; }
+.apple-input:focus { border-color: var(--blue); background: var(--blue-l); }
+.apple-input::placeholder { color: var(--label4); }
+.apple-select { width: 100%; padding: 13px 15px; border-radius: var(--r-md); background: var(--bg3); border: 1px solid var(--sep); color: var(--label); font-family: var(--font); font-size: 14px; outline: none; margin-bottom: 10px; transition: border-color .2s; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23aeaeb2' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+.btn-primary { width: 100%; padding: 15px; border-radius: 980px; border: none; background: var(--blue); color: #fff; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; box-shadow: 0 4px 14px rgba(0,113,227,0.28); transition: background .18s, transform .18s, box-shadow .18s; cursor: pointer; font-family: var(--font); }
+.btn-primary:hover { background: var(--blue-d); }
+.btn-primary:active { transform: scale(0.99); }
+.btn-ghost { width: 100%; padding: 14px; border-radius: 980px; border: 1px solid var(--sep); background: var(--bg); color: var(--label2); font-size: 14px; font-weight: 500; transition: all .18s; cursor: pointer; font-family: var(--font); }
+.btn-ghost:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-l); }
+.btn-sm { padding: 8px 16px; border-radius: 980px; border: 1px solid var(--sep); background: var(--bg); color: var(--blue); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; font-family: var(--font); white-space: nowrap; }
+.btn-sm:hover { background: var(--blue-l); border-color: var(--blue); }
+.btn-sm:active { opacity: 0.7; }
+.btn-sm-red { color: var(--red); border-color: rgba(255,59,48,0.2); }
+.btn-sm-red:hover { background: rgba(255,59,48,0.06); border-color: var(--red); }
+
+.type-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.tpill { padding: 6px 13px; border-radius: 980px; font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; border: 2px solid transparent; transition: transform .12s, box-shadow .12s, border-color .12s; -webkit-user-select: none; user-select: none; }
+.tpill:active { transform: scale(0.92); }
+.tpill.sel { border-color: var(--label); box-shadow: 0 0 0 1px var(--label); }
+
+.move-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; min-height: 28px; }
+.mchip { padding: 5px 11px; border-radius: 980px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; cursor: pointer; transition: opacity .15s; border: 1.5px solid; }
+.mchip:active { opacity: 0.6; }
+.mchip-x { font-size: 10px; opacity: 0.6; }
+
+.deck-card { background: var(--bg); border: 1px solid var(--sep); border-radius: var(--r-lg); margin-bottom: 10px; box-shadow: var(--sh-sm); overflow: hidden; }
+.deck-card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--sep); }
+.deck-card-name { font-size: 15px; font-weight: 700; color: var(--label); }
+.deck-card-count { font-size: 12px; color: var(--label2); margin-top: 2px; }
+.deck-card-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+.poke-row { display: flex; align-items: center; padding: 11px 16px; border-bottom: 1px solid var(--sep); gap: 10px; transition: background .15s; }
+.poke-row:last-child { border-bottom: none; }
+.poke-row:active { background: var(--bg2); }
+.poke-name-sm { font-size: 14px; font-weight: 600; color: var(--label); }
+.poke-types-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
+.ptag { padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; color: #fff; }
+.poke-moves-sm { font-size: 11px; color: var(--label2); margin-top: 3px; }
+
+.deck-picker { display: flex; gap: 6px; flex-wrap: wrap; }
+.deck-chip { padding: 8px 16px; border-radius: 980px; font-size: 13px; font-weight: 600; cursor: pointer; background: var(--bg); color: var(--label2); border: 1px solid var(--sep); box-shadow: var(--sh-sm); transition: all .15s; }
+.deck-chip.active { background: var(--blue-l); color: var(--blue); border-color: var(--blue); }
+.deck-chip:active { opacity: 0.7; }
+
+.sel-bar { background: var(--blue-l); border: 1px solid rgba(0,113,227,0.18); border-radius: var(--r-sm); padding: 8px 12px; margin: 8px 0; display: flex; flex-wrap: wrap; gap: 5px; }
+.sel-tag { background: rgba(0,113,227,0.10); border: 1px solid rgba(0,113,227,0.2); border-radius: 6px; padding: 3px 10px; font-size: 12px; color: var(--blue); font-weight: 600; }
+
+.result-card { background: var(--bg); border: 1px solid var(--sep); border-radius: var(--r-lg); padding: 14px 16px; margin-bottom: 8px; box-shadow: var(--sh-sm); transition: transform .2s, box-shadow .2s; }
+.result-card:hover { transform: translateY(-2px); box-shadow: var(--sh-md); }
+.result-best { background: #fff5f5; border-color: rgba(255,59,48,0.25); }
+.result-good { background: #fffbf0; border-color: rgba(255,149,0,0.25); }
+.result-bad { opacity: 0.55; }
+.result-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.rank-badge { padding: 3px 10px; border-radius: var(--r-sm); font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.r-s { background: var(--red); color: #fff; }
+.r-a { background: var(--orange); color: #fff; }
+.r-b { background: var(--blue); color: #fff; }
+.r-c { background: var(--bg3); color: var(--label3); border: 1px solid var(--sep); }
+.best-tag { margin-left: auto; padding: 3px 10px; border-radius: var(--r-sm); background: var(--red); color: #fff; font-size: 11px; font-weight: 700; }
+.result-name { font-size: 16px; font-weight: 700; color: var(--label); }
+.result-info { font-size: 12px; color: var(--label2); margin-top: 4px; line-height: 1.65; }
+.result-info strong { color: var(--label); font-weight: 600; }
+.score-bar { height: 4px; border-radius: 2px; background: var(--bg3); margin-top: 10px; overflow: hidden; }
+.score-fill { height: 4px; border-radius: 2px; transition: width .4s cubic-bezier(0.4,0,0.2,1); }
+
+.err-box { padding: 12px 16px; border-radius: var(--r-sm); border: 1px solid rgba(255,59,48,0.3); background: #fff5f5; font-size: 13px; color: var(--red); margin-bottom: 12px; line-height: 1.6; }
+
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--label2); }
+.empty-title { font-size: 17px; font-weight: 600; color: var(--label); margin-bottom: 6px; }
+.empty-sub { font-size: 14px; color: var(--label2); line-height: 1.6; }
+
+.modal-overlay { position: fixed; inset: 0; z-index: 200; display: flex; align-items: flex-end; justify-content: center; background: rgba(0,0,0,0.35); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity .25s; }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-sheet { background: var(--bg); border-radius: 20px 20px 0 0; width: 100%; max-width: 560px; padding: 0 0 calc(var(--safe-bot) + 16px); max-height: 88vh; overflow-y: auto; transform: translateY(100%); transition: transform .3s cubic-bezier(0.32,0.72,0,1); box-shadow: 0 -4px 32px rgba(0,0,0,0.12); }
+.modal-overlay.open .modal-sheet { transform: translateY(0); }
+.modal-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--sep-o); margin: 10px auto 0; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 10px; border-bottom: 1px solid var(--sep); }
+.modal-title { font-size: 17px; font-weight: 700; color: var(--label); }
+.modal-close { color: var(--blue); font-size: 15px; font-weight: 600; cursor: pointer; padding: 4px; background: none; border: none; font-family: var(--font); }
+.modal-body { padding: 16px; }
+.modal-lbl { font-size: 13px; font-weight: 600; color: var(--label2); display: block; margin-bottom: 6px; }
+
+.page-in { animation: pgIn .26s cubic-bezier(0.4,0,0.2,1) both; }
+@keyframes pgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="apple-hdr">
+    <div class="hdr-left">
+      <div class="hdr-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+      <div>
+        <div class="hdr-app-name">ポケバトル</div>
+        <div class="hdr-sub">バトルアドバイザー</div>
+      </div>
+    </div>
+    <button class="btn-link" id="hdr-action" onclick="openAddDeck()">＋ デッキ追加</button>
+  </header>
+
+  <div id="app-body">
+    <div id="sec-decks" class="content-wrap page-in">
+      <div id="deck-list"></div>
+    </div>
+    <div id="sec-battle" class="content-wrap page-in hidden">
+      <div class="grp-label">使用するデッキ</div>
+      <div class="deck-picker" id="deck-picker"></div>
+      <div class="grp-label" style="margin-top:20px">相手のタイプ（1〜2つ）</div>
+      <div class="apple-card">
+        <div class="type-grid" id="enemy-grid"></div>
+        <div id="enemy-tags"></div>
+      </div>
+      <div class="grp-label">おすすめ順</div>
+      <div id="battle-result">
+        <div class="empty-state"><div class="empty-title">デッキと相手のタイプを選んでください</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-item active" id="tab-decks" onclick="switchTab('decks')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+      <span class="tab-label">手持ち</span>
+    </button>
+    <button class="tab-item" id="tab-battle" onclick="switchTab('battle')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 3.5-3.5"/><path d="m16 16 4 4"/><path d="M10 9l-7 7 3 3 7-7"/></svg>
+      <span class="tab-label">バトル</span>
+    </button>
+  </div>
+</div>
+
+<!-- デッキ追加/編集モーダル -->
+<div class="modal-overlay" id="modal-deck" onclick="bgClose(event,'modal-deck')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title" id="modal-deck-title">デッキを追加</span>
+      <button class="modal-close" onclick="closeModal('modal-deck')">完了</button>
+    </div>
+    <div class="modal-body">
+      <label class="modal-lbl">デッキ名</label>
+      <input class="apple-input" id="deck-name-inp" placeholder="例: レイドデッキ・ジム攻略用" autocomplete="off">
+      <button class="btn-primary" id="deck-save-btn" onclick="saveDeck()">デッキを作成</button>
+    </div>
+  </div>
+</div>
+
+<!-- ポケモン追加/編集モーダル -->
+<div class="modal-overlay" id="modal-poke" onclick="bgClose(event,'modal-poke')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title" id="modal-poke-title">ポケモンを追加</span>
+      <button class="modal-close" onclick="closeModal('modal-poke')">完了</button>
+    </div>
+    <div class="modal-body">
+      <label class="modal-lbl">名前</label>
+      <input class="apple-input" id="poke-name-inp" placeholder="例: ガブリアス" autocomplete="off">
+      <label class="modal-lbl">自分のタイプ（1〜2つ）</label>
+      <div class="type-grid" id="my-type-grid" style="margin-bottom:14px"></div>
+      <label class="modal-lbl">技のタイプ</label>
+      <select class="apple-select" id="move-type-sel"><option value="">タイプを選択</option></select>
+      <input class="apple-input" id="move-name-inp" placeholder="技名（省略可）" autocomplete="off">
+      <button class="btn-ghost" onclick="addMove()" style="margin-bottom:12px">＋ 技を追加</button>
+      <div class="move-chips" id="move-preview"></div>
+      <div id="poke-err" class="err-box hidden"></div>
+      <button class="btn-primary" id="poke-save-btn" onclick="savePokemon()" style="margin-top:14px">追加する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TC={ノーマル:'#9A9A72',ほのお:'#E8720C',みず:'#5A8FE8',でんき:'#D4A800',くさ:'#5DA03E',こおり:'#72C4C4',かくとう:'#B82020',どく:'#8A2E8A',じめん:'#C8A428',ひこう:'#8A72D8',エスパー:'#E0407A',むし:'#8C9E12',いわ:'#9A8A18',ゴースト:'#5A3F78',ドラゴン:'#5A20E0',あく:'#5A3A28',はがね:'#9A9AB0',フェアリー:'#C45A8A'};
+const TYPES=Object.keys(TC);
+const EFF={ノーマル:{resist:['いわ','はがね'],immune:['ゴースト']},ほのお:{super:['くさ','こおり','むし','はがね'],resist:['ほのお','みず','いわ','ドラゴン']},みず:{super:['ほのお','じめん','いわ'],resist:['みず','くさ','ドラゴン']},でんき:{super:['みず','ひこう'],resist:['でんき','くさ','ドラゴン'],immune:['じめん']},くさ:{super:['みず','じめん','いわ'],resist:['ほのお','くさ','どく','ひこう','むし','ドラゴン','はがね']},こおり:{super:['くさ','じめん','ひこう','ドラゴン'],resist:['みず','こおり']},かくとう:{super:['ノーマル','こおり','いわ','あく','はがね'],resist:['どく','ひこう','エスパー','むし','フェアリー'],immune:['ゴースト']},どく:{super:['くさ','フェアリー'],resist:['どく','じめん','いわ','ゴースト'],immune:['はがね']},じめん:{super:['ほのお','でんき','どく','いわ','はがね'],resist:['くさ','むし'],immune:['ひこう']},ひこう:{super:['くさ','かくとう','むし'],resist:['でんき','いわ','はがね']},エスパー:{super:['かくとう','どく'],resist:['エスパー','はがね'],immune:['あく']},むし:{super:['くさ','エスパー','あく'],resist:['ほのお','かくとう','ひこう','ゴースト','はがね','フェアリー']},いわ:{super:['ほのお','こおり','ひこう','むし'],resist:['かくとう','じめん','はがね']},ゴースト:{super:['エスパー','ゴースト'],resist:['あく'],immune:['ノーマル']},ドラゴン:{super:['ドラゴン'],resist:['はがね'],immune:['フェアリー']},あく:{super:['エスパー','ゴースト'],resist:['かくとう','あく','フェアリー']},はがね:{super:['こおり','いわ','フェアリー'],resist:['ほのお','みず','でんき','はがね']},フェアリー:{super:['かくとう','ドラゴン','あく'],resist:['ほのお','どく','はがね']}};
+
+let data=JSON.parse(localStorage.getItem('pokebattle_v3')||'{"decks":[]}');
+let mySelTypes=[],myMoves=[],enemyTypes=[],activeDeckId=null;
+// edit state
+let editDeckId=null,editPokeId=null,editDeckContext=null;
+
+function save(){localStorage.setItem('pokebattle_v3',JSON.stringify(data));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+
+function atkMult(atk,defs){
+  let m=1;
+  defs.forEach(d=>{const e=EFF[atk]||{};if((e.super||[]).includes(d))m*=1.6;else if((e.immune||[]).includes(d))m*=0.390625;else if((e.resist||[]).includes(d))m*=0.625;});
+  return Math.round(m*1000)/1000;
+}
+
+function buildGrid(id,selArr,max,cb){
+  const el=document.getElementById(id);if(!el)return;
+  el.innerHTML='';
+  TYPES.forEach(t=>{
+    const s=document.createElement('span');
+    s.className='tpill'+(selArr.includes(t)?' sel':'');
+    s.textContent=t;s.style.background=TC[t];
+    s.onclick=()=>{
+      if(selArr.includes(t))selArr.splice(selArr.indexOf(t),1);
+      else{if(selArr.length>=max)selArr.shift();selArr.push(t);}
+      buildGrid(id,selArr,max,cb);cb();
+    };
+    el.appendChild(s);
+  });
+}
+
+function buildMoveSel(){
+  const s=document.getElementById('move-type-sel');if(!s)return;
+  s.innerHTML='<option value="">タイプを選択</option>';
+  TYPES.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;s.appendChild(o);});
+}
+
+function addMove(){
+  const t=document.getElementById('move-type-sel').value;if(!t)return;
+  const n=document.getElementById('move-name-inp').value.trim()||t+'わざ';
+  myMoves.push({type:t,name:n});
+  document.getElementById('move-name-inp').value='';
+  document.getElementById('move-type-sel').value='';
+  renderMovePrev();
+}
+function renderMovePrev(){
+  const el=document.getElementById('move-preview');if(!el)return;
+  el.innerHTML=myMoves.map((m,i)=>`
+    <span class="mchip" style="background:${TC[m.type]}14;color:${TC[m.type]};border-color:${TC[m.type]}44" onclick="removeMove(${i})">
+      ${m.name}<span class="mchip-x">x</span>
+    </span>`).join('');
+}
+function removeMove(i){myMoves.splice(i,1);renderMovePrev();}
+function showErr(id,msg){const e=document.getElementById(id);if(!e)return;e.textContent=msg;e.classList.remove('hidden');}
+function hideErr(id){const e=document.getElementById(id);if(e)e.classList.add('hidden');}
+
+/* ---- DECK CRUD ---- */
+function openAddDeck(){
+  editDeckId=null;
+  document.getElementById('modal-deck-title').textContent='デッキを追加';
+  document.getElementById('deck-save-btn').textContent='デッキを作成';
+  document.getElementById('deck-name-inp').value='';
+  openModal('modal-deck');
+}
+function openEditDeck(id){
+  const deck=data.decks.find(d=>d.id===id);if(!deck)return;
+  editDeckId=id;
+  document.getElementById('modal-deck-title').textContent='デッキ名を編集';
+  document.getElementById('deck-save-btn').textContent='保存する';
+  document.getElementById('deck-name-inp').value=deck.name;
+  openModal('modal-deck');
+}
+function saveDeck(){
+  const name=document.getElementById('deck-name-inp').value.trim();
+  if(!name){alert('デッキ名を入力してください');return;}
+  if(editDeckId){
+    const deck=data.decks.find(d=>d.id===editDeckId);
+    if(deck)deck.name=name;
+  } else {
+    data.decks.push({id:uid(),name,pokemons:[]});
+  }
+  save();closeModal('modal-deck');renderDecks();
+}
+function deleteDeck(id){
+  if(!confirm('このデッキを削除しますか？'))return;
+  data.decks=data.decks.filter(d=>d.id!==id);
+  if(activeDeckId===id)activeDeckId=null;
+  save();renderDecks();
+}
+
+/* ---- POKEMON CRUD ---- */
+function openAddPoke(deckId){
+  editDeckContext=deckId;editPokeId=null;
+  mySelTypes=[];myMoves=[];
+  document.getElementById('modal-poke-title').textContent='ポケモンを追加';
+  document.getElementById('poke-save-btn').textContent='追加する';
+  document.getElementById('poke-name-inp').value='';
+  document.getElementById('move-type-sel').value='';
+  buildGrid('my-type-grid',mySelTypes,2,()=>{});
+  renderMovePrev();hideErr('poke-err');
+  openModal('modal-poke');
+}
+function openEditPoke(deckId,pokeId){
+  const deck=data.decks.find(d=>d.id===deckId);if(!deck)return;
+  const poke=deck.pokemons.find(p=>p.id===pokeId);if(!poke)return;
+  editDeckContext=deckId;editPokeId=pokeId;
+  mySelTypes=[...poke.types];
+  myMoves=poke.moves.map(m=>({...m}));
+  document.getElementById('modal-poke-title').textContent='ポケモンを編集';
+  document.getElementById('poke-save-btn').textContent='保存する';
+  document.getElementById('poke-name-inp').value=poke.name;
+  document.getElementById('move-type-sel').value='';
+  buildGrid('my-type-grid',mySelTypes,2,()=>{});
+  renderMovePrev();hideErr('poke-err');
+  openModal('modal-poke');
+}
+function savePokemon(){
+  hideErr('poke-err');
+  const name=document.getElementById('poke-name-inp').value.trim();
+  if(!name){showErr('poke-err','名前を入力してください');return;}
+  if(!mySelTypes.length){showErr('poke-err','タイプを1つ以上選んでください');return;}
+  if(!myMoves.length){showErr('poke-err','技を1つ以上追加してください');return;}
+  const deck=data.decks.find(d=>d.id===editDeckContext);if(!deck)return;
+  if(editPokeId){
+    const idx=deck.pokemons.findIndex(p=>p.id===editPokeId);
+    if(idx>=0)deck.pokemons[idx]={id:editPokeId,name,types:[...mySelTypes],moves:[...myMoves]};
+  } else {
+    deck.pokemons.push({id:uid(),name,types:[...mySelTypes],moves:[...myMoves]});
+  }
+  save();closeModal('modal-poke');renderDecks();
+}
+function deletePoke(deckId,pokeId){
+  if(!confirm('このポケモンを削除しますか？'))return;
+  const deck=data.decks.find(d=>d.id===deckId);if(!deck)return;
+  deck.pokemons=deck.pokemons.filter(p=>p.id!==pokeId);
+  save();renderDecks();
+}
+
+/* ---- RENDER ---- */
+function renderDecks(){
+  const el=document.getElementById('deck-list');if(!el)return;
+  if(!data.decks.length){
+    el.innerHTML=`<div class="empty-state page-in">
+      <div class="empty-title">デッキがありません</div>
+      <div class="empty-sub">右上の「＋ デッキ追加」から<br>最初のデッキを作りましょう</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML=data.decks.map(deck=>`
+    <div class="page-in">
+      <div class="grp-label">${deck.name}</div>
+      <div class="deck-card">
+        <div class="deck-card-header">
+          <div>
+            <div class="deck-card-name">${deck.name}</div>
+            <div class="deck-card-count">${deck.pokemons.length}体登録済み</div>
+          </div>
+          <div class="deck-card-actions">
+            <button class="btn-sm" onclick="openAddPoke('${deck.id}')">＋ 追加</button>
+            <button class="btn-sm" onclick="openEditDeck('${deck.id}')">編集</button>
+            <button class="btn-sm btn-sm-red" onclick="deleteDeck('${deck.id}')">削除</button>
+          </div>
+        </div>
+        ${deck.pokemons.length===0
+          ?`<div style="padding:16px;color:var(--label3);font-size:14px;text-align:center">ポケモンを追加してください</div>`
+          :deck.pokemons.map(p=>`
+            <div class="poke-row">
+              <div style="flex:1">
+                <div class="poke-name-sm">${p.name}</div>
+                <div class="poke-types-row">${p.types.map(t=>`<span class="ptag" style="background:${TC[t]}">${t}</span>`).join('')}</div>
+                <div class="poke-moves-sm">技: ${p.moves.map(m=>`<span style="color:${TC[m.type]};font-weight:600">${m.name}</span>`).join('・')}</div>
+              </div>
+              <div style="display:flex;gap:5px;flex-shrink:0">
+                <button class="btn-sm" onclick="openEditPoke('${deck.id}','${p.id}')">編集</button>
+                <button class="btn-sm btn-sm-red" onclick="deletePoke('${deck.id}','${p.id}')">削除</button>
+              </div>
+            </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function renderDeckPicker(){
+  const el=document.getElementById('deck-picker');if(!el)return;
+  if(!data.decks.length){el.innerHTML='<span style="color:var(--label3);font-size:14px">まず手持ちタブでデッキを作成してください</span>';return;}
+  el.innerHTML=data.decks.map(d=>`
+    <span class="deck-chip${activeDeckId===d.id?' active':''}" onclick="selectDeck('${d.id}')">${d.name}</span>`).join('');
+}
+function selectDeck(id){activeDeckId=id;renderDeckPicker();renderBattle();}
+
+function renderEnemyTags(){
+  const el=document.getElementById('enemy-tags');if(!el)return;
+  if(!enemyTypes.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="sel-bar">${enemyTypes.map(t=>`<span class="sel-tag">${t}</span>`).join('')}</div>`;
+}
+
+function renderBattle(){
+  const el=document.getElementById('battle-result');if(!el)return;
+  if(!activeDeckId||!enemyTypes.length){
+    el.innerHTML=`<div class="empty-state"><div class="empty-title">デッキと相手のタイプを選んでください</div></div>`;return;
+  }
+  const deck=data.decks.find(d=>d.id===activeDeckId);
+  if(!deck||!deck.pokemons.length){
+    el.innerHTML=`<div class="empty-state"><div class="empty-title">このデッキにポケモンがいません</div><div class="empty-sub">手持ちタブでポケモンを追加してください</div></div>`;return;
+  }
+  const results=deck.pokemons.map(p=>{
+    let bestMult=0,bestMove=null;
+    p.moves.forEach(m=>{const mult=atkMult(m.type,enemyTypes);if(mult>bestMult){bestMult=mult;bestMove=m;}});
+    let defWorst=1;TYPES.forEach(t=>{const m=atkMult(t,p.types);if(m>defWorst)defWorst=m;});
+    const stab=bestMove&&p.types.includes(bestMove.type)?0.2:0;
+    const score=bestMult*(1+stab)*(1/Math.max(defWorst,0.5));
+    return{p,bestMult,bestMove,defWorst,stab,score};
+  }).sort((a,b)=>b.score-a.score);
+  const maxScore=results[0].score;
+  el.innerHTML=results.map((r,idx)=>{
+    const pct=Math.round((r.score/maxScore)*100);
+    let rank,rClass,cardClass;
+    if(r.bestMult>=2.56){rank='S';rClass='r-s';cardClass=idx===0?'result-best':'result-good';}
+    else if(r.bestMult>=1.6){rank='A';rClass='r-a';cardClass=idx===0?'result-best':'result-good';}
+    else if(r.bestMult>=1.0){rank='B';rClass='r-b';cardClass='';}
+    else{rank='C';rClass='r-c';cardClass='result-bad';}
+    const atkLbl=r.bestMult>=2.56?'2重バツグン x2.56':r.bestMult>=1.6?'バツグン x1.6':r.bestMult<0.625?'イマイチ':'等倍';
+    const defLbl=r.defWorst>=2.56?'▲ 2重弱点あり':r.defWorst>=1.6?'△ 弱点あり':r.defWorst<=0.625?'◎ 耐性あり':'— 等倍';
+    const stab=r.stab>0?' (タイプ一致)':'';
+    const barColor=rank==='S'?'#ff3b30':rank==='A'?'#ff9500':rank==='B'?'#0071e3':'#c7c7cc';
+    return`<div class="result-card ${cardClass} page-in">
+      <div class="result-header">
+        <span class="rank-badge ${rClass}">${rank}</span>
+        <span class="result-name">${r.p.name}</span>
+        ${idx===0?'<span class="best-tag">おすすめ</span>':''}
+      </div>
+      <div class="poke-types-row" style="margin-bottom:6px">${r.p.types.map(t=>`<span class="ptag" style="background:${TC[t]}">${t}</span>`).join('')}</div>
+      <div class="result-info">最強技: <strong>${r.bestMove?r.bestMove.name:'—'}</strong> → <strong>${atkLbl}</strong>${stab}</div>
+      <div class="result-info">被ダメ: <strong>${defLbl}</strong>（最大x${r.defWorst.toFixed(2)}）</div>
+      <div class="score-bar"><div class="score-fill" style="width:${pct}%;background:${barColor}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function switchTab(name){
+  ['decks','battle'].forEach(n=>{
+    document.getElementById('sec-'+n).classList.toggle('hidden',n!==name);
+    document.getElementById('tab-'+n).classList.toggle('active',n===name);
+  });
+  document.getElementById('hdr-action').style.display=name==='decks'?'':'none';
+  if(name==='battle'){renderDeckPicker();renderBattle();}
+}
+
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+
+buildGrid('enemy-grid',enemyTypes,2,()=>{renderEnemyTags();renderBattle();});
+buildMoveSel();
+buildGrid('my-type-grid',mySelTypes,2,()=>{});
+renderDecks();
+</script>
+</body>
+</html>
