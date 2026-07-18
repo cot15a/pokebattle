@@ -1209,7 +1209,8 @@ const POKEDEX_RAW=`フシギダネ|くさ,どく
 テツノブジン|フェアリー,かくとう
 コライドン|かくとう,ドラゴン
 ミライドン|でんき,ドラゴン`;
-const POKEDEX=POKEDEX_RAW.split('\n').map(l=>{const[n,t]=l.split('|');return{name:n,types:t.split(',')};});
+function toKata(s){return s.replace(/[ぁ-ゖ]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60));}
+const POKEDEX=POKEDEX_RAW.split('\n').map(l=>{const[n,t]=l.split('|');return{name:n,types:t.split(','),kana:toKata(n)};});
 
 let data=JSON.parse(localStorage.getItem('pokebattle_v3')||'{"decks":[]}');
 let mySelTypes=[],myMoves=[],enemyTypes=[],activeDeckId=null;
@@ -1273,11 +1274,12 @@ function onPokeNameInput(){
   if(!inp||!box)return;
   const q=inp.value.trim();
   if(!q){hidePokeAc();return;}
+  const qk=toKata(q);
   const starts=[],incl=[];
   for(let i=0;i<POKEDEX.length;i++){
-    const n=POKEDEX[i].name;
-    if(n.startsWith(q))starts.push(i);
-    else if(n.includes(q))incl.push(i);
+    const k=POKEDEX[i].kana;
+    if(k.startsWith(qk))starts.push(i);
+    else if(k.includes(qk))incl.push(i);
   }
   const matches=starts.concat(incl).slice(0,8);
   if(!matches.length){
