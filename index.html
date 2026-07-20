@@ -263,6 +263,24 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
 .ddp-danger { box-shadow: 0 0 0 2px var(--red); }
 .deck-diag-ok { font-size: 11px; color: var(--green); font-weight: 600; padding-top: 3px; }
 
+/* トースト通知（非ブロッキングのフィードバック＋取り消し） */
+#toast-host { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(74px + var(--safe-bot)); z-index: 300; display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 520px; padding: 0 16px; pointer-events: none; }
+.toast { pointer-events: auto; background: rgba(28,28,30,0.97); color: #fff; border-radius: 14px; padding: 12px 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.28); display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); animation: toastIn .28s cubic-bezier(0.32,0.72,0,1) both; }
+.toast.out { animation: toastOut .22s ease forwards; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(16px) scale(0.98); } to { opacity: 1; transform: none; } }
+@keyframes toastOut { to { opacity: 0; transform: translateY(8px); } }
+.toast-msg { flex: 1; line-height: 1.4; }
+.toast-action { flex-shrink: 0; background: none; border: none; color: #4da3ff; font-size: 14px; font-weight: 700; cursor: pointer; padding: 4px 6px; margin: -4px -2px; font-family: var(--font); }
+.toast-action:active { opacity: 0.6; }
+.toast-ok { color: #30d158; flex-shrink: 0; display: flex; }
+
+/* 検索クリアボタン */
+.search-clear { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; border-radius: 11px; border: none; background: var(--label3); color: var(--bg); display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; transition: opacity .15s; }
+.search-clear:active { opacity: 0.6; }
+
+/* 空状態のアクションボタン */
+.empty-cta { max-width: 260px; margin: 18px auto 0; }
+
 /* ダークモード */
 @media (prefers-color-scheme: dark) {
   :root {
@@ -315,6 +333,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
         <div class="search-wrap">
           <span class="search-icn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
           <input class="apple-input" id="deck-search-inp" placeholder="名前・タイプ・デッキ名で絞り込み" autocomplete="off" oninput="onDeckSearch()">
+          <button class="search-clear hidden" id="search-clear-btn" onclick="clearDeckSearch()" aria-label="検索をクリア"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
         </div>
         <select class="apple-select sort-sel" id="deck-sort-sel" onchange="onDeckSort()">
           <option value="order">登録順</option>
@@ -428,6 +447,9 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
     </div>
   </div>
 </div>
+
+<!-- トースト通知 -->
+<div id="toast-host"></div>
 
 <script>
 const TC={ノーマル:'#9A9A72',ほのお:'#E8720C',みず:'#5A8FE8',でんき:'#D4A800',くさ:'#5DA03E',こおり:'#72C4C4',かくとう:'#B82020',どく:'#8A2E8A',じめん:'#C8A428',ひこう:'#8A72D8',エスパー:'#E0407A',むし:'#8C9E12',いわ:'#9A8A18',ゴースト:'#5A3F78',ドラゴン:'#5A20E0',あく:'#5A3A28',はがね:'#9A9AB0',フェアリー:'#C45A8A'};
@@ -1391,6 +1413,29 @@ try{
 }
 // HTMLエスケープ（ユーザーが入力した名前を安全に表示する）
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+// トースト通知（opts.actionLabel/onAction で「元に戻す」対応）
+let toastTimer=null;
+function showToast(msg,opts){
+  opts=opts||{};
+  const host=document.getElementById('toast-host');if(!host)return;
+  host.innerHTML='';
+  const t=document.createElement('div');t.className='toast';
+  const m=document.createElement('span');m.className='toast-msg';m.textContent=msg;t.appendChild(m);
+  if(opts.actionLabel&&opts.onAction){
+    const b=document.createElement('button');b.className='toast-action';b.textContent=opts.actionLabel;
+    b.onclick=()=>{clearTimeout(toastTimer);host.innerHTML='';opts.onAction();};
+    t.appendChild(b);
+  }else{
+    const ok=document.createElement('span');ok.className='toast-ok';
+    ok.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+    t.appendChild(ok);
+  }
+  host.appendChild(t);
+  clearTimeout(toastTimer);
+  const dur=opts.duration||(opts.actionLabel?5000:2200);
+  toastTimer=setTimeout(()=>{t.classList.add('out');setTimeout(()=>{if(t.parentNode)t.remove();},220);},dur);
+}
 // インポート等で入る不正データを整形（欠けている項目を補い、無効なタイプ/技を除去）
 function normalizeData(d){
   const out={decks:[],seeded:d&&d.seeded?true:undefined};
@@ -1427,13 +1472,14 @@ const SAMPLE_DECK={
     {name:'ルカリオ',types:['かくとう','はがね'],moves:[{type:'かくとう',name:'インファイト'},{type:'はがね',name:'ラスターカノン'}]}
   ]
 };
-function addSampleDeck(){
+function addSampleDeck(silent){
   data.decks.push({
     id:uid(),
     name:SAMPLE_DECK.name,
     pokemons:SAMPLE_DECK.pokemons.map(p=>({id:uid(),name:p.name,types:[...p.types],moves:p.moves.map(m=>({...m}))}))
   });
   save();renderDecks();
+  if(!silent)showToast('最強サンプルデッキを追加しました');
 }
 
 /* ---- デッキ弱点診断（チーム全体で共通して弱いタイプを可視化）---- */
@@ -1665,6 +1711,7 @@ function exportData(){
   a.download=`pokebattle-backup-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.json`;
   document.body.appendChild(a);a.click();
   document.body.removeChild(a);URL.revokeObjectURL(url);
+  showToast('バックアップを書き出しました');
 }
 function importData(ev){
   const file=ev.target.files&&ev.target.files[0];
@@ -1678,7 +1725,7 @@ function importData(ev){
       data=normalizeData(parsed);  // 欠けた項目を補い、不正なタイプ/技を除去して安全化
       activeDeckId=null;
       save();renderDecks();renderDeckPicker();renderBattle();
-      alert('データを読み込みました');
+      showToast('データを読み込みました');
     }catch(err){
       alert('読み込みに失敗しました: '+err.message);
     }
@@ -1690,6 +1737,14 @@ function importData(ev){
 /* ---- デッキ内検索・並べ替え ---- */
 function onDeckSearch(){
   deckSearch=document.getElementById('deck-search-inp').value.trim();
+  const clr=document.getElementById('search-clear-btn');
+  if(clr)clr.classList.toggle('hidden',!deckSearch);
+  renderDecks();
+}
+function clearDeckSearch(){
+  const inp=document.getElementById('deck-search-inp');if(inp)inp.value='';
+  deckSearch='';
+  const clr=document.getElementById('search-clear-btn');if(clr)clr.classList.add('hidden');
   renderDecks();
 }
 function movePoke(deckId,pokeId,dir){
@@ -1729,6 +1784,7 @@ function doCopyPoke(destDeckId){
   if(!poke)return;
   dest.pokemons.push({id:uid(),name:poke.name,types:[...poke.types],moves:poke.moves.map(m=>({...m}))});
   save();closeModal('modal-copy');renderDecks();
+  showToast(`「${poke.name}」を${dest.name}に複製しました`);
   copyPokeSrc=null;
 }
 
@@ -1757,13 +1813,20 @@ function saveDeck(){
   } else {
     data.decks.push({id:uid(),name,pokemons:[]});
   }
+  const wasEdit=!!editDeckId;
   save();closeModal('modal-deck');renderDecks();
+  showToast(wasEdit?'デッキ名を更新しました':`「${name}」を作成しました`);
 }
 function deleteDeck(id){
-  if(!confirm('このデッキを削除しますか？'))return;
-  data.decks=data.decks.filter(d=>d.id!==id);
+  const idx=data.decks.findIndex(d=>d.id===id);if(idx<0)return;
+  const removed=data.decks[idx];
+  data.decks.splice(idx,1);
   if(activeDeckId===id)activeDeckId=null;
   save();renderDecks();
+  showToast(`「${removed.name}」を削除しました`,{actionLabel:'元に戻す',onAction:()=>{
+    data.decks.splice(Math.min(idx,data.decks.length),0,removed);
+    save();renderDecks();showToast('削除を取り消しました');
+  }});
 }
 
 /* ---- POKEMON CRUD ---- */
@@ -1799,6 +1862,7 @@ function savePokemon(){
   if(!mySelTypes.length){showErr('poke-err','タイプを1つ以上選んでください');return;}
   if(!myMoves.length){showErr('poke-err','技を1つ以上追加してください');return;}
   const deck=data.decks.find(d=>d.id===editDeckContext);if(!deck)return;
+  const wasEdit=!!editPokeId;
   if(editPokeId){
     const idx=deck.pokemons.findIndex(p=>p.id===editPokeId);
     if(idx>=0)deck.pokemons[idx]={id:editPokeId,name,types:[...mySelTypes],moves:[...myMoves]};
@@ -1806,12 +1870,19 @@ function savePokemon(){
     deck.pokemons.push({id:uid(),name,types:[...mySelTypes],moves:[...myMoves]});
   }
   save();closeModal('modal-poke');renderDecks();
+  showToast(wasEdit?'保存しました':`「${name}」を追加しました`);
 }
 function deletePoke(deckId,pokeId){
-  if(!confirm('このポケモンを削除しますか？'))return;
   const deck=data.decks.find(d=>d.id===deckId);if(!deck)return;
-  deck.pokemons=deck.pokemons.filter(p=>p.id!==pokeId);
+  const idx=deck.pokemons.findIndex(p=>p.id===pokeId);if(idx<0)return;
+  const removed=deck.pokemons[idx];
+  deck.pokemons.splice(idx,1);
   save();renderDecks();
+  showToast(`「${removed.name}」を削除しました`,{actionLabel:'元に戻す',onAction:()=>{
+    const d=data.decks.find(x=>x.id===deckId);if(!d)return;
+    d.pokemons.splice(Math.min(idx,d.pokemons.length),0,removed);
+    save();renderDecks();showToast('削除を取り消しました');
+  }});
 }
 
 /* ---- RENDER ---- */
@@ -1820,7 +1891,9 @@ function renderDecks(){
   if(!data.decks.length){
     el.innerHTML=`<div class="empty-state page-in">
       <div class="empty-title">デッキがありません</div>
-      <div class="empty-sub">右上の「＋ デッキ追加」から<br>最初のデッキを作りましょう</div>
+      <div class="empty-sub">まずは1つデッキを作って<br>ポケモンを登録しましょう</div>
+      <button class="btn-primary empty-cta" onclick="openAddDeck()">＋ 最初のデッキを作る</button>
+      <button class="btn-ghost empty-cta" onclick="addSampleDeck()" style="margin-top:10px">最強サンプルデッキを使う</button>
     </div>`;
     return;
   }
@@ -1999,7 +2072,13 @@ function switchTab(name){
     document.getElementById('tab-'+n).classList.toggle('active',n===name);
   });
   document.getElementById('hdr-action').style.display=name==='decks'?'':'none';
-  if(name==='battle'){renderDeckPicker();renderBattle();}
+  if(name==='battle'){
+    // デッキ未選択（または削除済み）なら先頭を自動選択して、すぐ使える状態に
+    if((!activeDeckId||!data.decks.some(d=>d.id===activeDeckId))&&data.decks.length){
+      activeDeckId=data.decks[0].id;
+    }
+    renderDeckPicker();renderBattle();
+  }
 }
 
 function openModal(id){document.getElementById(id).classList.add('open');}
@@ -2023,7 +2102,7 @@ buildGrid('my-type-grid',mySelTypes,2,renderStabSuggest);
 // 初回だけ最強サンプルデッキを投入（一度出したら記録し、以後は空でも自動投入しない）
 if(!data.seeded){
   data.seeded=true;
-  if(!data.decks.length)addSampleDeck(); else save();
+  if(!data.decks.length)addSampleDeck(true); else save();
 }
 renderDecks();
 
