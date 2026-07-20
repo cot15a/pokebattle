@@ -112,10 +112,15 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
 .mchip-x { font-size: 10px; opacity: 0.6; }
 
 .deck-card { background: var(--bg); border: 1px solid var(--sep); border-radius: var(--r-lg); margin-bottom: 10px; box-shadow: var(--sh-sm); overflow: hidden; }
-.deck-card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--sep); }
-.deck-card-name { font-size: 15px; font-weight: 700; color: var(--label); }
+.deck-card-header { display: flex; align-items: center; gap: 8px; padding: 14px 16px; border-bottom: 1px solid var(--sep); }
+.deck-card-header.collapsed { border-bottom: none; }
+.deck-toggle { flex: 1; display: flex; align-items: center; gap: 9px; cursor: pointer; min-width: 0; background: none; border: none; text-align: left; padding: 4px 0; font-family: var(--font); }
+.deck-toggle:active { opacity: 0.55; }
+.deck-chevron { color: var(--label3); flex-shrink: 0; transition: transform .22s cubic-bezier(0.4,0,0.2,1); }
+.deck-chevron.open { transform: rotate(90deg); }
+.deck-card-name { font-size: 15px; font-weight: 700; color: var(--label); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .deck-card-count { font-size: 12px; color: var(--label2); margin-top: 2px; }
-.deck-card-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.deck-card-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
 
 .poke-row { display: flex; align-items: center; padding: 11px 16px; border-bottom: 1px solid var(--sep); gap: 10px; transition: background .15s; }
 .poke-row:last-child { border-bottom: none; }
@@ -1457,6 +1462,7 @@ function normalizeData(d){
 }
 let mySelTypes=[],myMoves=[],enemyTypes=[],activeDeckId=null;
 let weather='',deckSearch='',deckSort='order',copyPokeSrc=null,enemyPick=false;
+let collapsedDecks=new Set();  // 折りたたみ中のデッキID（セッション内）
 // edit state
 let editDeckId=null,editPokeId=null,editDeckContext=null;
 
@@ -1755,6 +1761,17 @@ function movePoke(deckId,pokeId,dir){
   const t=deck.pokemons[i];deck.pokemons[i]=deck.pokemons[j];deck.pokemons[j]=t;
   save();renderDecks();
 }
+function moveDeck(id,dir){
+  const i=data.decks.findIndex(d=>d.id===id);
+  const j=i+dir;
+  if(i<0||j<0||j>=data.decks.length)return;
+  const t=data.decks[i];data.decks[i]=data.decks[j];data.decks[j]=t;
+  save();renderDecks();
+}
+function toggleDeck(id){
+  if(collapsedDecks.has(id))collapsedDecks.delete(id);else collapsedDecks.add(id);
+  renderDecks();
+}
 
 /* ---- ポケモン間コピー ---- */
 function openCopyPoke(deckId,pokeId){
@@ -1912,27 +1929,14 @@ function renderDecks(){
     if(deckSearch && !visible.length)return '';
     const lastIdx=total-1;
     const diagHtml=total>=2?deckDiagHtml(deck):'';
-    return `
-    <div class="page-in">
-      <div class="grp-label">${esc(deck.name)}</div>
-      <div class="deck-card">
-        <div class="deck-card-header">
-          <div>
-            <div class="deck-card-name">${esc(deck.name)}</div>
-            <div class="deck-card-count">${total}体登録済み${deckSearch?` / ${visible.length}体該当`:''}</div>
-          </div>
-          <div class="deck-card-actions">
-            <button class="btn-sm" onclick="openAddPoke('${deck.id}')">＋ 追加</button>
-            <button class="btn-sm" onclick="openEditDeck('${deck.id}')">編集</button>
-            <button class="btn-sm btn-sm-red" onclick="deleteDeck('${deck.id}')">削除</button>
-          </div>
-        </div>
-        ${diagHtml}
-        ${total===0
-          ?`<div style="padding:16px;color:var(--label3);font-size:14px;text-align:center">ポケモンを追加してください</div>`
-          :visible.map(p=>{
-            const idx=deck.pokemons.indexOf(p);
-            return `
+    const collapsed=collapsedDecks.has(deck.id) && !deckSearch;
+    const dIdx=data.decks.indexOf(deck);
+    const showDeckReorder=!deckSearch && data.decks.length>1;
+    const pokeRows=total===0
+      ?`<div style="padding:16px;color:var(--label3);font-size:14px;text-align:center">ポケモンを追加してください</div>`
+      :visible.map(p=>{
+          const idx=deck.pokemons.indexOf(p);
+          return `
             <div class="poke-row">
               ${showReorder?`<div class="reorder-col">
                 <button class="reorder-btn" onclick="movePoke('${deck.id}','${p.id}',-1)" ${idx===0?'disabled':''} aria-label="上へ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button>
@@ -1948,7 +1952,29 @@ function renderDecks(){
                 <button class="btn-sm" onclick="openCopyPoke('${deck.id}','${p.id}')">複製</button>
                 <button class="btn-sm btn-sm-red" onclick="deletePoke('${deck.id}','${p.id}')">削除</button>
               </div>
-            </div>`;}).join('')}
+            </div>`;}).join('');
+    return `
+    <div class="page-in">
+      <div class="deck-card">
+        <div class="deck-card-header${collapsed?' collapsed':''}">
+          ${showDeckReorder?`<div class="reorder-col">
+            <button class="reorder-btn" onclick="moveDeck('${deck.id}',-1)" ${dIdx===0?'disabled':''} aria-label="デッキを上へ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button>
+            <button class="reorder-btn" onclick="moveDeck('${deck.id}',1)" ${dIdx===data.decks.length-1?'disabled':''} aria-label="デッキを下へ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+          </div>`:''}
+          <div class="deck-toggle" onclick="toggleDeck('${deck.id}')">
+            <svg class="deck-chevron${collapsed?'':' open'}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            <div style="min-width:0">
+              <div class="deck-card-name">${esc(deck.name)}</div>
+              <div class="deck-card-count">${total}体${deckSearch?` / ${visible.length}体該当`:'登録済み'}${collapsed?'・タップで開く':''}</div>
+            </div>
+          </div>
+          <div class="deck-card-actions">
+            <button class="btn-sm" onclick="openAddPoke('${deck.id}')">＋ 追加</button>
+            <button class="btn-sm" onclick="openEditDeck('${deck.id}')">編集</button>
+            <button class="btn-sm btn-sm-red" onclick="deleteDeck('${deck.id}')">削除</button>
+          </div>
+        </div>
+        ${collapsed?'':`${diagHtml}${pokeRows}`}
       </div>
     </div>`;
   }).join('');
