@@ -6,7 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="ポケバトル">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
 <title>ポケバトル</title>
 <!-- PWAアイコン（ポケボール / インラインPNG 180x180） -->
 <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEoklEQVR42u3d0XEbMQyEYTaQEjSpwv0Xkxo8eTxX4MQiARC7+DH36JF14Dcr+3QHroeivqlFCyhwUOCgwEGBgwJHbb1evzcOcOAAMdY4skHMgbIAARRPHN1MmClZmECJCQ5FFrpEFiZQooojY2H+fPzaOAYSWfYs9ihUcgFHKYs8EHlQwJEoox5EOBRwBLPoYyJKCTjMWXgQWXIyVEycKxmNYw4LUSJLQoYHi20is3BMZrFHZAQOWAgRWcjAx30csIgi4oYDGYo+VhMZsHiXiAMOZOj6WMjAxwUcsKghoocDGQY+FjLwUYcDGTY+FjLwUYEDGWY+FjLwcRkHK1rpoxcOZFj6WMjARxYOZBj7AAc4cnAgw9vHQgY+SnGwWq18VOMgNiaExyI2CI9IHMgY4mPxgcKHSwUO1sYsPBYy8AEOcGTiQMY0H+AAxzEOZAz0AQ5wpOFgDRR9ROIgNmaGx5oZG8y3jMHh1DLFqeoXw2MKjg6bcgzCMZOFUwdOcUi3pmbPJePwWK6xUbknl2t4GOK4tW3bLByKjbi7rZ/ZJ8tyio0O2z46hYcPjrytKjx8zMVRsEOFuo9IHEJnXjlVXtfHRlvWkNgoHn3mER7yOG6N+XUKD08cdwdAy/mIwaF+tmWj4z1wfNeoZRwbT0kZh4ctjqewwKF0hCxt3lUQlY6NxlH8UuDQkNHhNcHREUerlxXDMVDG9o95t24WjvqfB4dqbGz8JWEcHqNxRN3PAQ5zHCeXucDhhuPw+un2LwKHGI7za+TgAAc4wAEOcIADHOAABzjAwb+y4OAiGDi4fA4OvngDB1/Z85U9N/twsw+3CXKbIDi4wZhHE3g0ARw81NQFx+fn3z6HyuOQEk2bhaPPg9RTcODDUsZ7OGzC4/rwFt3YkMdx0YecjIk4rvhQlFGBQzQ86kdNCnXpbRx+4RF4J9iE2PDB8a6PV+Z4a63+jMCx4SPjkGtOMA58OLVlE4dieFz0odiTf6++IY56IrrdSMGBD48+HOGQDo9sIuod+O/SH206rNKdcCIeJw6OYCJOpxyAw+CT5VyJ35n+ZN3X4SVC3a5NOA4vEK/DS8gsgGtsBODAh2tsgAMcETjwMU0GOMARhAMfo2SAAxxxOPAxR0YwDnyYPSL6Ng7CY0hsbOLAxwQZKTjwYTNzYBMH4WEfG1k48OExqmQfBz7sh9gc4cCH93gjcIAjDQc+XGXE4MCHpYwwHPjwk1GHAx+Vt863w4EPMxnBOPDhJCMeBz5sZKTgwIeHjCwc+DCQkYgDH+oycnE8ssNchZ72Tl2+XBz40JVRgQMfojKKcDw/nvMKi7I53Y1w4ENORimOR3mqfJ9JQ5XrVYoDH0IyLuCAiASLmzge/R0qyljcknETx+OyVUUqi4syLuOYRkSIRRccz+52zq4mmsjogsOViC6LdjhOiLRSEruhPDhifFyEcv6eGy5ERxxRRLKhRL3DtkvQF0cskXMuGe+kefO748gjcveQaLsGDhslWt0Ww6FLRLHPkjiElEi3VxtHWyUeXTXB0QGKXycNcVRC8e6eOY5AMQMbNREHBQ4KHBQ4KHBQ4KAU6gvgR5FMAOM8vQAAAABJRU5ErkJggg==">
@@ -185,6 +187,20 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
 /* ツールバー（検索・バックアップ） */
 .toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
 .toolbar .apple-input { margin-bottom: 0; }
+.sort-sel { width: auto; margin-bottom: 0; flex-shrink: 0; padding: 13px 34px 13px 14px; font-size: 13px; }
+.grp-label-row { display: flex; align-items: center; justify-content: space-between; margin: 20px 0 6px; }
+.grp-label-row .btn-link { padding: 0 4px; font-size: 12px; font-weight: 600; }
+
+/* 相手の弱点・耐性サマリー */
+.enemy-summary { background: var(--bg); border: 1px solid var(--sep); border-radius: var(--r-lg); padding: 12px 14px; margin-bottom: 8px; box-shadow: var(--sh-sm); }
+.esum-row { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; }
+.esum-row + .esum-row { border-top: 1px solid var(--sep); }
+.esum-lbl { font-size: 12px; font-weight: 700; flex-shrink: 0; width: 82px; padding-top: 3px; }
+.esum-lbl.good { color: var(--red); }
+.esum-lbl.bad { color: var(--blue); }
+.esum-pills { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; }
+.esum-pill { padding: 3px 9px; border-radius: 6px; font-size: 11px; font-weight: 600; color: #fff; }
+.esum-none { font-size: 12px; color: var(--label3); padding-top: 3px; }
 .search-wrap { position: relative; flex: 1; }
 .search-wrap .apple-input { padding-left: 38px; }
 .search-icn { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--label3); pointer-events: none; }
@@ -212,6 +228,9 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
 .party-slot { font-size: 10px; font-weight: 700; color: var(--label3); margin-bottom: 4px; }
 .party-name { font-size: 13px; font-weight: 700; color: var(--label); line-height: 1.3; word-break: break-word; }
 .party-types { display: flex; gap: 3px; justify-content: center; flex-wrap: wrap; margin-top: 5px; }
+.party-cap { font-size: 11px; color: var(--label2); margin: -4px 0 10px; }
+.party-weak { font-size: 10px; color: var(--label3); margin-top: 5px; line-height: 1.4; }
+.party-weak span { font-weight: 700; }
 
 /* 危険バッジ（逆引き警告） */
 .result-danger { border-color: rgba(255,59,48,0.4); box-shadow: 0 0 0 1px rgba(255,59,48,0.12); }
@@ -279,8 +298,12 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
       <div class="toolbar">
         <div class="search-wrap">
           <span class="search-icn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
-          <input class="apple-input" id="deck-search-inp" placeholder="ポケモン名・タイプで絞り込み" autocomplete="off" oninput="onDeckSearch()">
+          <input class="apple-input" id="deck-search-inp" placeholder="名前・タイプ・デッキ名で絞り込み" autocomplete="off" oninput="onDeckSearch()">
         </div>
+        <select class="apple-select sort-sel" id="deck-sort-sel" onchange="onDeckSort()">
+          <option value="order">登録順</option>
+          <option value="name">名前順</option>
+        </select>
       </div>
       <div class="backup-row">
         <button class="btn-ghost" onclick="exportData()">データを書き出す</button>
@@ -297,11 +320,15 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
         <input class="apple-input" id="enemy-name-inp" placeholder="例: カイリュー（選ぶとタイプ自動入力）" autocomplete="off" oninput="onEnemyNameInput()" onfocus="onEnemyNameInput()" onblur="setTimeout(hideEnemyAc,150)">
         <div id="enemy-ac" class="ac-list hidden"></div>
       </div>
-      <div class="grp-label" style="margin-top:14px">相手のタイプ（1〜2つ）</div>
+      <div class="grp-label-row" style="margin-top:14px">
+        <span class="grp-label" style="margin:0">相手のタイプ（1〜2つ）</span>
+        <button class="btn-link" id="enemy-clear-btn" onclick="clearEnemy()" style="display:none">クリア</button>
+      </div>
       <div class="apple-card">
         <div class="type-grid" id="enemy-grid"></div>
         <div id="enemy-tags"></div>
       </div>
+      <div id="enemy-summary"></div>
       <div class="grp-label" style="margin-top:20px">天候ブースト</div>
       <select class="apple-select" id="weather-sel" onchange="onWeatherChange()">
         <option value="">なし</option>
@@ -1339,7 +1366,7 @@ const WEATHER_BOOST=1.2;
 
 let data=JSON.parse(localStorage.getItem('pokebattle_v3')||'{"decks":[]}');
 let mySelTypes=[],myMoves=[],enemyTypes=[],activeDeckId=null;
-let weather='',deckSearch='',copyPokeSrc=null;
+let weather='',deckSearch='',deckSort='order',copyPokeSrc=null;
 // edit state
 let editDeckId=null,editPokeId=null,editDeckContext=null;
 
@@ -1483,17 +1510,61 @@ function pickEnemy(i){
   document.getElementById('enemy-name-inp').value=p.name;
   enemyTypes.length=0;
   p.types.slice(0,2).forEach(t=>enemyTypes.push(t));
-  buildGrid('enemy-grid',enemyTypes,2,()=>{renderEnemyTags();renderBattle();});
-  renderEnemyTags();renderBattle();
+  buildGrid('enemy-grid',enemyTypes,2,onEnemyChange);
+  onEnemyChange();
   hideEnemyAc();
 }
 function hideEnemyAc(){
   const box=document.getElementById('enemy-ac');
   if(box){box.classList.add('hidden');box.innerHTML='';}
 }
+function onEnemyChange(){
+  renderEnemyTags();renderEnemySummary();updateEnemyClearBtn();renderBattle();
+}
+function updateEnemyClearBtn(){
+  const b=document.getElementById('enemy-clear-btn');if(!b)return;
+  b.style.display=enemyTypes.length?'':'none';
+}
+function clearEnemy(){
+  enemyTypes.length=0;
+  const ni=document.getElementById('enemy-name-inp');if(ni)ni.value='';
+  hideEnemyAc();
+  buildGrid('enemy-grid',enemyTypes,2,onEnemyChange);
+  onEnemyChange();
+}
+/* 相手の弱点・耐性サマリー（逆引き：どのタイプで攻めると効くか）*/
+function renderEnemySummary(){
+  const el=document.getElementById('enemy-summary');if(!el)return;
+  if(!enemyTypes.length){el.innerHTML='';return;}
+  const dbl=[],sup=[],res=[];
+  TYPES.forEach(t=>{
+    const m=atkMult(t,enemyTypes);
+    if(m>=2.56)dbl.push(t);
+    else if(m>=1.6)sup.push(t);
+    else if(m<0.9)res.push(t);
+  });
+  const pills=arr=>arr.length?arr.map(t=>`<span class="esum-pill" style="background:${TC[t]}">${t}</span>`).join(''):'<span class="esum-none">なし</span>';
+  const goodPills=
+    dbl.map(t=>`<span class="esum-pill" style="background:${TC[t]};box-shadow:0 0 0 2px var(--red)">${t} ×2</span>`).join('')+
+    sup.map(t=>`<span class="esum-pill" style="background:${TC[t]}">${t}</span>`).join('');
+  el.innerHTML=`<div class="enemy-summary page-in">
+    <div class="esum-row">
+      <span class="esum-lbl good">有効な攻撃</span>
+      <span class="esum-pills">${(dbl.length||sup.length)?goodPills:'<span class="esum-none">なし</span>'}</span>
+    </div>
+    <div class="esum-row">
+      <span class="esum-lbl bad">効きにくい</span>
+      <span class="esum-pills">${pills(res)}</span>
+    </div>
+  </div>`;
+}
 function onWeatherChange(){
   weather=document.getElementById('weather-sel').value;
   renderBattle();
+}
+function onDeckSort(){
+  deckSort=document.getElementById('deck-sort-sel').value;
+  renderDecks();
 }
 function weatherBonus(type){
   return (weather&&WEATHER[weather]&&WEATHER[weather].types.includes(type))?WEATHER_BOOST:1;
@@ -1675,9 +1746,12 @@ function renderDecks(){
     if(toKata(p.name).includes(qk))return true;
     return p.types.some(t=>toKata(t).includes(qk));
   };
+  const showReorder=deckSort==='order' && !deckSearch;
   const rows=data.decks.map(deck=>{
     const total=deck.pokemons.length;
-    const visible=deck.pokemons.filter(matchPoke);
+    const deckNameHit=qk && toKata(deck.name).includes(qk);
+    let visible=deck.pokemons.filter(p=>deckNameHit||matchPoke(p));
+    if(deckSort==='name')visible=[...visible].sort((a,b)=>a.name.localeCompare(b.name,'ja'));
     if(deckSearch && !visible.length)return '';
     const lastIdx=total-1;
     return `
@@ -1701,10 +1775,10 @@ function renderDecks(){
             const idx=deck.pokemons.indexOf(p);
             return `
             <div class="poke-row">
-              <div class="reorder-col">
+              ${showReorder?`<div class="reorder-col">
                 <button class="reorder-btn" onclick="movePoke('${deck.id}','${p.id}',-1)" ${idx===0?'disabled':''} aria-label="上へ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button>
                 <button class="reorder-btn" onclick="movePoke('${deck.id}','${p.id}',1)" ${idx===lastIdx?'disabled':''} aria-label="下へ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
-              </div>
+              </div>`:''}
               <div style="flex:1;min-width:0">
                 <div class="poke-name-sm">${p.name}</div>
                 <div class="poke-types-row">${p.types.map(t=>`<span class="ptag" style="background:${TC[t]}">${t}</span>`).join('')}</div>
@@ -1762,18 +1836,40 @@ function renderBattle(){
     return{p,bestMult,bestRaw,bestMove,bestBoosted,defWorst,enemyDmg,danger,stab,score};
   }).sort((a,b)=>b.score-a.score);
   const maxScore=results[0].score||1;
-  // おすすめ3体パーティ
-  const top3=results.slice(0,3);
-  const partyHtml=top3.length?`
+  // おすすめ3体パーティ（弱点が偏らないよう分散選出）
+  const weakOf=p=>new Set(TYPES.filter(t=>atkMult(t,p.types)>=1.6));
+  const pool=results.map(r=>({r,weak:weakOf(r.p)}));
+  const party=[];
+  if(pool.length){
+    party.push(pool[0]);
+    while(party.length<3 && party.length<pool.length){
+      let best=null,bestVal=-Infinity;
+      pool.forEach(c=>{
+        if(party.includes(c))return;
+        let overlap=0;
+        c.weak.forEach(t=>{if(party.some(m=>m.weak.has(t)))overlap++;});
+        const val=c.r.score*(1-Math.min(overlap,5)*0.09);
+        if(val>bestVal){bestVal=val;best=c;}
+      });
+      if(!best)break;
+      party.push(best);
+    }
+  }
+  const partyHtml=party.length?`
     <div class="party-block page-in">
       <div class="party-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>おすすめ3体パーティ</div>
+      <div class="party-cap">スコアと弱点の分散を両立する編成</div>
       <div class="party-members">
-        ${top3.map((r,i)=>`
+        ${party.map((c,i)=>{
+          const r=c.r;
+          const wk=[...c.weak].slice(0,4);
+          return `
           <div class="party-member">
             <div class="party-slot">${i+1}番手</div>
             <div class="party-name">${r.p.name}</div>
             <div class="party-types">${r.p.types.map(t=>`<span class="ptag" style="background:${TC[t]}">${t}</span>`).join('')}</div>
-          </div>`).join('')}
+            <div class="party-weak">弱点 ${wk.length?wk.map(t=>`<span style="color:${TC[t]}">${t}</span>`).join('・'):'なし'}</div>
+          </div>`;}).join('')}
       </div>
     </div>`:'';
   el.innerHTML=partyHtml+results.map((r,idx)=>{
@@ -1827,11 +1923,18 @@ function buildWeatherSel(){
   });
 }
 
-buildGrid('enemy-grid',enemyTypes,2,()=>{renderEnemyTags();renderBattle();});
+buildGrid('enemy-grid',enemyTypes,2,onEnemyChange);
 buildWeatherSel();
 buildMoveSel();
 buildGrid('my-type-grid',mySelTypes,2,renderStabSuggest);
 renderDecks();
+
+/* PWA: Service Worker 登録（http(s)配信時のみ有効。file://では無視される）*/
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>
