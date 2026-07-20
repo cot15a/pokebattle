@@ -181,6 +181,82 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
 .ac-types { display: flex; gap: 4px; flex-shrink: 0; }
 .ac-type { padding: 2px 9px; border-radius: 6px; font-size: 11px; font-weight: 600; color: #fff; }
 .ac-empty { padding: 14px; text-align: center; font-size: 13px; color: var(--label3); }
+
+/* ツールバー（検索・バックアップ） */
+.toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
+.toolbar .apple-input { margin-bottom: 0; }
+.search-wrap { position: relative; flex: 1; }
+.search-wrap .apple-input { padding-left: 38px; }
+.search-icn { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--label3); pointer-events: none; }
+.backup-row { display: flex; gap: 8px; margin-bottom: 14px; }
+.backup-row .btn-ghost { padding: 11px; font-size: 13px; }
+
+/* 並べ替えボタン */
+.reorder-col { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
+.reorder-btn { width: 30px; height: 22px; border-radius: 6px; border: 1px solid var(--sep); background: var(--bg); color: var(--label2); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; padding: 0; }
+.reorder-btn:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); background: var(--blue-l); }
+.reorder-btn:disabled { opacity: 0.3; cursor: default; }
+.poke-act-row { display: flex; gap: 5px; flex-wrap: wrap; flex-shrink: 0; }
+
+/* STABサジェスト */
+.stab-suggest { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 12px; min-height: 4px; }
+.stab-chip { padding: 7px 13px; border-radius: 980px; font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; border: none; transition: transform .12s, opacity .15s; display: inline-flex; align-items: center; gap: 4px; }
+.stab-chip:active { transform: scale(0.93); }
+.stab-hint { font-size: 12px; color: var(--label3); padding: 2px 2px 10px; }
+
+/* おすすめ3体パーティ */
+.party-block { background: linear-gradient(135deg, var(--blue-l), transparent); border: 1px solid rgba(0,113,227,0.22); border-radius: var(--r-lg); padding: 14px 16px; margin-bottom: 14px; box-shadow: var(--sh-sm); }
+.party-title { font-size: 13px; font-weight: 700; color: var(--blue); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.party-members { display: flex; gap: 8px; }
+.party-member { flex: 1; background: var(--bg); border: 1px solid var(--sep); border-radius: var(--r-md); padding: 10px 8px; text-align: center; box-shadow: var(--sh-sm); }
+.party-slot { font-size: 10px; font-weight: 700; color: var(--label3); margin-bottom: 4px; }
+.party-name { font-size: 13px; font-weight: 700; color: var(--label); line-height: 1.3; word-break: break-word; }
+.party-types { display: flex; gap: 3px; justify-content: center; flex-wrap: wrap; margin-top: 5px; }
+
+/* 危険バッジ（逆引き警告） */
+.result-danger { border-color: rgba(255,59,48,0.4); box-shadow: 0 0 0 1px rgba(255,59,48,0.12); }
+.danger-badge { padding: 3px 9px; border-radius: var(--r-sm); background: var(--red); color: #fff; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; }
+.warn-line { color: var(--red); font-weight: 600; }
+
+/* 天候セレクタ */
+.weather-boost-tag { display: inline-flex; align-items: center; gap: 3px; color: var(--orange); font-weight: 600; }
+
+/* コピー先デッキ選択 */
+.copy-deck-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.copy-deck-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: var(--r-md); border: 1px solid var(--sep); background: var(--bg3); cursor: pointer; transition: all .15s; }
+.copy-deck-item:hover { border-color: var(--blue); background: var(--blue-l); }
+.copy-deck-item:active { opacity: 0.7; }
+.copy-deck-nm { font-size: 14px; font-weight: 600; color: var(--label); }
+.copy-deck-ct { font-size: 12px; color: var(--label2); }
+
+/* ダークモード */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:  #1c1c1e;
+    --bg2: #2c2c2e;
+    --bg3: #000000;
+    --sep: rgba(255,255,255,0.14);
+    --sep-o: #48484a;
+    --label:  #f5f5f7;
+    --label2: #98989d;
+    --label3: #68686e;
+    --label4: #48484a;
+    --blue:   #0a84ff;
+    --blue-d: #409cff;
+    --blue-l: rgba(10,132,255,0.16);
+    --green: #30d158;
+    --red:   #ff453a;
+    --orange: #ff9f0a;
+    --sh-sm: 0 1px 3px rgba(0,0,0,0.4);
+    --sh-md: 0 4px 16px rgba(0,0,0,0.5);
+    --sh-lg: 0 8px 32px rgba(0,0,0,0.6);
+  }
+  .apple-hdr { background: rgba(28,28,30,0.82); }
+  .tab-bar { background: rgba(28,28,30,0.9); }
+  .result-best { background: rgba(255,69,58,0.13); }
+  .result-good { background: rgba(255,159,10,0.13); }
+  .err-box { background: rgba(255,69,58,0.13); }
+}
 </style>
 </head>
 <body>
@@ -200,16 +276,36 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
 
   <div id="app-body">
     <div id="sec-decks" class="content-wrap page-in">
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
+          <input class="apple-input" id="deck-search-inp" placeholder="ポケモン名・タイプで絞り込み" autocomplete="off" oninput="onDeckSearch()">
+        </div>
+      </div>
+      <div class="backup-row">
+        <button class="btn-ghost" onclick="exportData()">データを書き出す</button>
+        <button class="btn-ghost" onclick="document.getElementById('import-file').click()">データを読み込む</button>
+        <input type="file" id="import-file" accept="application/json,.json" class="hidden" onchange="importData(event)">
+      </div>
       <div id="deck-list"></div>
     </div>
     <div id="sec-battle" class="content-wrap page-in hidden">
       <div class="grp-label">使用するデッキ</div>
       <div class="deck-picker" id="deck-picker"></div>
-      <div class="grp-label" style="margin-top:20px">相手のタイプ（1〜2つ）</div>
+      <div class="grp-label" style="margin-top:20px">相手ポケモン名から検索</div>
+      <div class="ac-wrap">
+        <input class="apple-input" id="enemy-name-inp" placeholder="例: カイリュー（選ぶとタイプ自動入力）" autocomplete="off" oninput="onEnemyNameInput()" onfocus="onEnemyNameInput()" onblur="setTimeout(hideEnemyAc,150)">
+        <div id="enemy-ac" class="ac-list hidden"></div>
+      </div>
+      <div class="grp-label" style="margin-top:14px">相手のタイプ（1〜2つ）</div>
       <div class="apple-card">
         <div class="type-grid" id="enemy-grid"></div>
         <div id="enemy-tags"></div>
       </div>
+      <div class="grp-label" style="margin-top:20px">天候ブースト</div>
+      <select class="apple-select" id="weather-sel" onchange="onWeatherChange()">
+        <option value="">なし</option>
+      </select>
       <div class="grp-label">おすすめ順</div>
       <div id="battle-result">
         <div class="empty-state"><div class="empty-title">デッキと相手のタイプを選んでください</div></div>
@@ -260,7 +356,9 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
         <div id="poke-ac" class="ac-list hidden"></div>
       </div>
       <label class="modal-lbl">自分のタイプ（1〜2つ）</label>
-      <div class="type-grid" id="my-type-grid" style="margin-bottom:14px"></div>
+      <div class="type-grid" id="my-type-grid" style="margin-bottom:12px"></div>
+      <label class="modal-lbl">おすすめ技（タイプ一致・ワンタップ追加）</label>
+      <div class="stab-suggest" id="stab-suggest"></div>
       <label class="modal-lbl">技のタイプ</label>
       <select class="apple-select" id="move-type-sel"><option value="">タイプを選択</option></select>
       <input class="apple-input" id="move-name-inp" placeholder="技名（省略可）" autocomplete="off">
@@ -268,6 +366,21 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
       <div class="move-chips" id="move-preview"></div>
       <div id="poke-err" class="err-box hidden"></div>
       <button class="btn-primary" id="poke-save-btn" onclick="savePokemon()" style="margin-top:14px">追加する</button>
+    </div>
+  </div>
+</div>
+
+<!-- ポケモンコピー先デッキ選択モーダル -->
+<div class="modal-overlay" id="modal-copy" onclick="bgClose(event,'modal-copy')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title" id="modal-copy-title">コピー先のデッキ</span>
+      <button class="modal-close" onclick="closeModal('modal-copy')">閉じる</button>
+    </div>
+    <div class="modal-body">
+      <label class="modal-lbl">複製先のデッキを選んでください</label>
+      <div class="copy-deck-list" id="copy-deck-list"></div>
     </div>
   </div>
 </div>
@@ -1212,8 +1325,21 @@ const POKEDEX_RAW=`フシギダネ|くさ,どく
 function toKata(s){return s.replace(/[ぁ-ゖ]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60));}
 const POKEDEX=POKEDEX_RAW.split('\n').map(l=>{const[n,t]=l.split('|');return{name:n,types:t.split(','),kana:toKata(n)};});
 
+/* ---- 天候ブースト（ポケモンGO準拠：該当タイプの攻撃技が1.2倍）---- */
+const WEATHER={
+  はれ:{label:'はれ / 快晴',types:['くさ','ほのお','じめん']},
+  あめ:{label:'あめ',types:['みず','でんき','むし']},
+  くもりはれ:{label:'くもり時々はれ',types:['ノーマル','いわ']},
+  くもり:{label:'くもり',types:['フェアリー','かくとう','どく']},
+  かぜ:{label:'かぜ',types:['ドラゴン','ひこう','エスパー']},
+  ゆき:{label:'ゆき',types:['こおり','はがね']},
+  きり:{label:'きり',types:['あく','ゴースト']}
+};
+const WEATHER_BOOST=1.2;
+
 let data=JSON.parse(localStorage.getItem('pokebattle_v3')||'{"decks":[]}');
 let mySelTypes=[],myMoves=[],enemyTypes=[],activeDeckId=null;
+let weather='',deckSearch='',copyPokeSrc=null;
 // edit state
 let editDeckId=null,editPokeId=null,editDeckContext=null;
 
@@ -1264,6 +1390,22 @@ function renderMovePrev(){
     </span>`).join('');
 }
 function removeMove(i){myMoves.splice(i,1);renderMovePrev();}
+
+/* ---- わざ自動サジェスト（タイプ一致 / STAB）---- */
+function renderStabSuggest(){
+  const el=document.getElementById('stab-suggest');if(!el)return;
+  if(!mySelTypes.length){el.innerHTML='<span class="stab-hint">タイプを選ぶとタイプ一致技を提案します</span>';return;}
+  el.innerHTML=mySelTypes.map(t=>{
+    const has=myMoves.some(m=>m.type===t);
+    if(has)return '';
+    return `<button type="button" class="stab-chip" style="background:${TC[t]}" onclick="addStabMove('${t}')">＋ ${t}技</button>`;
+  }).join('')||'<span class="stab-hint">タイプ一致技は追加済みです</span>';
+}
+function addStabMove(t){
+  if(!TYPES.includes(t))return;
+  myMoves.push({type:t,name:t+'技'});
+  renderMovePrev();renderStabSuggest();
+}
 function showErr(id,msg){const e=document.getElementById(id);if(!e)return;e.textContent=msg;e.classList.remove('hidden');}
 function hideErr(id){const e=document.getElementById(id);if(e)e.classList.add('hidden');}
 
@@ -1299,12 +1441,140 @@ function pickPoke(i){
   const p=POKEDEX[i];if(!p)return;
   document.getElementById('poke-name-inp').value=p.name;
   mySelTypes=p.types.slice(0,2);
-  buildGrid('my-type-grid',mySelTypes,2,()=>{});
+  buildGrid('my-type-grid',mySelTypes,2,renderStabSuggest);
+  renderStabSuggest();
   hidePokeAc();
 }
 function hidePokeAc(){
   const box=document.getElementById('poke-ac');
   if(box){box.classList.add('hidden');box.innerHTML='';}
+}
+
+/* ---- 相手ポケモン名オートコンプリート ---- */
+function onEnemyNameInput(){
+  const inp=document.getElementById('enemy-name-inp');
+  const box=document.getElementById('enemy-ac');
+  if(!inp||!box)return;
+  const q=inp.value.trim();
+  if(!q){hideEnemyAc();return;}
+  const qk=toKata(q);
+  const starts=[],incl=[];
+  for(let i=0;i<POKEDEX.length;i++){
+    const k=POKEDEX[i].kana;
+    if(k.startsWith(qk))starts.push(i);
+    else if(k.includes(qk))incl.push(i);
+  }
+  const matches=starts.concat(incl).slice(0,8);
+  if(!matches.length){
+    box.innerHTML='<div class="ac-empty">該当するポケモンがいません</div>';
+    box.classList.remove('hidden');return;
+  }
+  box.innerHTML=matches.map(i=>{
+    const p=POKEDEX[i];
+    return `<div class="ac-item" onclick="pickEnemy(${i})">
+      <span class="ac-name">${p.name}</span>
+      <span class="ac-types">${p.types.map(t=>`<span class="ac-type" style="background:${TC[t]}">${t}</span>`).join('')}</span>
+    </div>`;
+  }).join('');
+  box.classList.remove('hidden');
+}
+function pickEnemy(i){
+  const p=POKEDEX[i];if(!p)return;
+  document.getElementById('enemy-name-inp').value=p.name;
+  enemyTypes.length=0;
+  p.types.slice(0,2).forEach(t=>enemyTypes.push(t));
+  buildGrid('enemy-grid',enemyTypes,2,()=>{renderEnemyTags();renderBattle();});
+  renderEnemyTags();renderBattle();
+  hideEnemyAc();
+}
+function hideEnemyAc(){
+  const box=document.getElementById('enemy-ac');
+  if(box){box.classList.add('hidden');box.innerHTML='';}
+}
+function onWeatherChange(){
+  weather=document.getElementById('weather-sel').value;
+  renderBattle();
+}
+function weatherBonus(type){
+  return (weather&&WEATHER[weather]&&WEATHER[weather].types.includes(type))?WEATHER_BOOST:1;
+}
+
+/* ---- データのバックアップ ---- */
+function exportData(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const d=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  a.href=url;
+  a.download=`pokebattle-backup-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.json`;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+function importData(ev){
+  const file=ev.target.files&&ev.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const parsed=JSON.parse(e.target.result);
+      if(!parsed||!Array.isArray(parsed.decks))throw new Error('形式が不正です');
+      if(!confirm('現在のデータを読み込んだ内容で置き換えます。よろしいですか？')){ev.target.value='';return;}
+      data=parsed;
+      activeDeckId=null;
+      save();renderDecks();renderDeckPicker();renderBattle();
+      alert('データを読み込みました');
+    }catch(err){
+      alert('読み込みに失敗しました: '+err.message);
+    }
+    ev.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+/* ---- デッキ内検索・並べ替え ---- */
+function onDeckSearch(){
+  deckSearch=document.getElementById('deck-search-inp').value.trim();
+  renderDecks();
+}
+function movePoke(deckId,pokeId,dir){
+  const deck=data.decks.find(d=>d.id===deckId);if(!deck)return;
+  const i=deck.pokemons.findIndex(p=>p.id===pokeId);
+  const j=i+dir;
+  if(i<0||j<0||j>=deck.pokemons.length)return;
+  const t=deck.pokemons[i];deck.pokemons[i]=deck.pokemons[j];deck.pokemons[j]=t;
+  save();renderDecks();
+}
+
+/* ---- ポケモン間コピー ---- */
+function openCopyPoke(deckId,pokeId){
+  copyPokeSrc={deckId,pokeId};
+  const src=data.decks.find(d=>d.id===deckId);
+  const poke=src&&src.pokemons.find(p=>p.id===pokeId);
+  const list=document.getElementById('copy-deck-list');
+  const others=data.decks.filter(d=>d.id!==deckId);
+  document.getElementById('modal-copy-title').textContent=poke?`「${poke.name}」を複製`:'コピー先のデッキ';
+  if(!others.length){
+    list.innerHTML='<div class="stab-hint" style="text-align:center;padding:12px">他にデッキがありません。<br>先にデッキを作成してください。</div>';
+  } else {
+    list.innerHTML=others.map(d=>`
+      <div class="copy-deck-item" onclick="doCopyPoke('${d.id}')">
+        <span class="copy-deck-nm">${d.name}</span>
+        <span class="copy-deck-ct">${d.pokemons.length}体</span>
+      </div>`).join('');
+  }
+  openModal('modal-copy');
+}
+function doCopyPoke(destDeckId){
+  if(!copyPokeSrc)return;
+  const src=data.decks.find(d=>d.id===copyPokeSrc.deckId);
+  const dest=data.decks.find(d=>d.id===destDeckId);
+  if(!src||!dest)return;
+  const poke=src.pokemons.find(p=>p.id===copyPokeSrc.pokeId);
+  if(!poke)return;
+  dest.pokemons.push({id:uid(),name:poke.name,types:[...poke.types],moves:poke.moves.map(m=>({...m}))});
+  save();closeModal('modal-copy');renderDecks();
+  copyPokeSrc=null;
 }
 
 /* ---- DECK CRUD ---- */
@@ -1349,8 +1619,8 @@ function openAddPoke(deckId){
   document.getElementById('poke-save-btn').textContent='追加する';
   document.getElementById('poke-name-inp').value='';
   document.getElementById('move-type-sel').value='';
-  buildGrid('my-type-grid',mySelTypes,2,()=>{});
-  renderMovePrev();hideErr('poke-err');hidePokeAc();
+  buildGrid('my-type-grid',mySelTypes,2,renderStabSuggest);
+  renderMovePrev();renderStabSuggest();hideErr('poke-err');hidePokeAc();
   openModal('modal-poke');
 }
 function openEditPoke(deckId,pokeId){
@@ -1363,8 +1633,8 @@ function openEditPoke(deckId,pokeId){
   document.getElementById('poke-save-btn').textContent='保存する';
   document.getElementById('poke-name-inp').value=poke.name;
   document.getElementById('move-type-sel').value='';
-  buildGrid('my-type-grid',mySelTypes,2,()=>{});
-  renderMovePrev();hideErr('poke-err');hidePokeAc();
+  buildGrid('my-type-grid',mySelTypes,2,renderStabSuggest);
+  renderMovePrev();renderStabSuggest();hideErr('poke-err');hidePokeAc();
   openModal('modal-poke');
 }
 function savePokemon(){
@@ -1399,14 +1669,25 @@ function renderDecks(){
     </div>`;
     return;
   }
-  el.innerHTML=data.decks.map(deck=>`
+  const qk=deckSearch?toKata(deckSearch):'';
+  const matchPoke=p=>{
+    if(!qk)return true;
+    if(toKata(p.name).includes(qk))return true;
+    return p.types.some(t=>toKata(t).includes(qk));
+  };
+  const rows=data.decks.map(deck=>{
+    const total=deck.pokemons.length;
+    const visible=deck.pokemons.filter(matchPoke);
+    if(deckSearch && !visible.length)return '';
+    const lastIdx=total-1;
+    return `
     <div class="page-in">
       <div class="grp-label">${deck.name}</div>
       <div class="deck-card">
         <div class="deck-card-header">
           <div>
             <div class="deck-card-name">${deck.name}</div>
-            <div class="deck-card-count">${deck.pokemons.length}体登録済み</div>
+            <div class="deck-card-count">${total}体登録済み${deckSearch?` / ${visible.length}体該当`:''}</div>
           </div>
           <div class="deck-card-actions">
             <button class="btn-sm" onclick="openAddPoke('${deck.id}')">＋ 追加</button>
@@ -1414,22 +1695,31 @@ function renderDecks(){
             <button class="btn-sm btn-sm-red" onclick="deleteDeck('${deck.id}')">削除</button>
           </div>
         </div>
-        ${deck.pokemons.length===0
+        ${total===0
           ?`<div style="padding:16px;color:var(--label3);font-size:14px;text-align:center">ポケモンを追加してください</div>`
-          :deck.pokemons.map(p=>`
+          :visible.map(p=>{
+            const idx=deck.pokemons.indexOf(p);
+            return `
             <div class="poke-row">
-              <div style="flex:1">
+              <div class="reorder-col">
+                <button class="reorder-btn" onclick="movePoke('${deck.id}','${p.id}',-1)" ${idx===0?'disabled':''} aria-label="上へ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button>
+                <button class="reorder-btn" onclick="movePoke('${deck.id}','${p.id}',1)" ${idx===lastIdx?'disabled':''} aria-label="下へ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+              </div>
+              <div style="flex:1;min-width:0">
                 <div class="poke-name-sm">${p.name}</div>
                 <div class="poke-types-row">${p.types.map(t=>`<span class="ptag" style="background:${TC[t]}">${t}</span>`).join('')}</div>
                 <div class="poke-moves-sm">技: ${p.moves.map(m=>`<span style="color:${TC[m.type]};font-weight:600">${m.name}</span>`).join('・')}</div>
               </div>
-              <div style="display:flex;gap:5px;flex-shrink:0">
+              <div class="poke-act-row">
                 <button class="btn-sm" onclick="openEditPoke('${deck.id}','${p.id}')">編集</button>
+                <button class="btn-sm" onclick="openCopyPoke('${deck.id}','${p.id}')">複製</button>
                 <button class="btn-sm btn-sm-red" onclick="deletePoke('${deck.id}','${p.id}')">削除</button>
               </div>
-            </div>`).join('')}
+            </div>`;}).join('')}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+  el.innerHTML=rows || `<div class="empty-state page-in"><div class="empty-title">該当なし</div><div class="empty-sub">「${deckSearch}」に一致するポケモンはいません</div></div>`;
 }
 
 function renderDeckPicker(){
@@ -1456,34 +1746,59 @@ function renderBattle(){
     el.innerHTML=`<div class="empty-state"><div class="empty-title">このデッキにポケモンがいません</div><div class="empty-sub">手持ちタブでポケモンを追加してください</div></div>`;return;
   }
   const results=deck.pokemons.map(p=>{
-    let bestMult=0,bestMove=null;
-    p.moves.forEach(m=>{const mult=atkMult(m.type,enemyTypes);if(mult>bestMult){bestMult=mult;bestMove=m;}});
+    let bestMult=0,bestRaw=0,bestMove=null,bestBoosted=false;
+    p.moves.forEach(m=>{
+      const raw=atkMult(m.type,enemyTypes);
+      const wb=weatherBonus(m.type);
+      const mult=raw*wb;
+      if(mult>bestMult){bestMult=mult;bestRaw=raw;bestMove=m;bestBoosted=wb>1;}
+    });
     let defWorst=1;TYPES.forEach(t=>{const m=atkMult(t,p.types);if(m>defWorst)defWorst=m;});
+    // 逆引き：相手タイプの攻撃でどれだけ被弾するか（タイプ一致技を想定）
+    let enemyDmg=0;enemyTypes.forEach(et=>{const m=atkMult(et,p.types);if(m>enemyDmg)enemyDmg=m;});
+    const danger=enemyDmg>=1.6;
     const stab=bestMove&&p.types.includes(bestMove.type)?0.2:0;
-    const score=bestMult*(1+stab)*(1/Math.max(defWorst,0.5));
-    return{p,bestMult,bestMove,defWorst,stab,score};
+    const score=bestMult*(1+stab)*(1/Math.max(defWorst,0.5))*(danger?0.75:1);
+    return{p,bestMult,bestRaw,bestMove,bestBoosted,defWorst,enemyDmg,danger,stab,score};
   }).sort((a,b)=>b.score-a.score);
-  const maxScore=results[0].score;
-  el.innerHTML=results.map((r,idx)=>{
+  const maxScore=results[0].score||1;
+  // おすすめ3体パーティ
+  const top3=results.slice(0,3);
+  const partyHtml=top3.length?`
+    <div class="party-block page-in">
+      <div class="party-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>おすすめ3体パーティ</div>
+      <div class="party-members">
+        ${top3.map((r,i)=>`
+          <div class="party-member">
+            <div class="party-slot">${i+1}番手</div>
+            <div class="party-name">${r.p.name}</div>
+            <div class="party-types">${r.p.types.map(t=>`<span class="ptag" style="background:${TC[t]}">${t}</span>`).join('')}</div>
+          </div>`).join('')}
+      </div>
+    </div>`:'';
+  el.innerHTML=partyHtml+results.map((r,idx)=>{
     const pct=Math.round((r.score/maxScore)*100);
     let rank,rClass,cardClass;
-    if(r.bestMult>=2.56){rank='S';rClass='r-s';cardClass=idx===0?'result-best':'result-good';}
-    else if(r.bestMult>=1.6){rank='A';rClass='r-a';cardClass=idx===0?'result-best':'result-good';}
-    else if(r.bestMult>=1.0){rank='B';rClass='r-b';cardClass='';}
+    if(r.bestRaw>=2.56){rank='S';rClass='r-s';cardClass=idx===0?'result-best':'result-good';}
+    else if(r.bestRaw>=1.6){rank='A';rClass='r-a';cardClass=idx===0?'result-best':'result-good';}
+    else if(r.bestRaw>=1.0){rank='B';rClass='r-b';cardClass='';}
     else{rank='C';rClass='r-c';cardClass='result-bad';}
-    const atkLbl=r.bestMult>=2.56?'2重バツグン x2.56':r.bestMult>=1.6?'バツグン x1.6':r.bestMult<0.625?'イマイチ':'等倍';
+    if(r.danger)cardClass=(cardClass+' result-danger').trim();
+    const atkLbl=r.bestRaw>=2.56?'2重バツグン x2.56':r.bestRaw>=1.6?'バツグン x1.6':r.bestRaw<0.625?'イマイチ':'等倍';
     const defLbl=r.defWorst>=2.56?'▲ 2重弱点あり':r.defWorst>=1.6?'△ 弱点あり':r.defWorst<=0.625?'◎ 耐性あり':'— 等倍';
     const stab=r.stab>0?' (タイプ一致)':'';
     const barColor=rank==='S'?'#ff3b30':rank==='A'?'#ff9500':rank==='B'?'#0071e3':'#c7c7cc';
+    const wTag=r.bestBoosted?` <span class="weather-boost-tag">▲天候ブースト x1.2</span>`:'';
+    const dangerBadge=r.danger?`<span class="danger-badge">▲ 弱点注意</span>`:'';
     return`<div class="result-card ${cardClass} page-in">
       <div class="result-header">
         <span class="rank-badge ${rClass}">${rank}</span>
         <span class="result-name">${r.p.name}</span>
-        ${idx===0?'<span class="best-tag">おすすめ</span>':''}
+        ${idx===0?'<span class="best-tag">おすすめ</span>':dangerBadge?`<span style="margin-left:auto">${dangerBadge}</span>`:''}
       </div>
       <div class="poke-types-row" style="margin-bottom:6px">${r.p.types.map(t=>`<span class="ptag" style="background:${TC[t]}">${t}</span>`).join('')}</div>
-      <div class="result-info">最強技: <strong>${r.bestMove?r.bestMove.name:'—'}</strong> → <strong>${atkLbl}</strong>${stab}</div>
-      <div class="result-info">被ダメ: <strong>${defLbl}</strong>（最大x${r.defWorst.toFixed(2)}）</div>
+      <div class="result-info">最強技: <strong>${r.bestMove?r.bestMove.name:'—'}</strong> → <strong>${atkLbl}</strong>${stab}${wTag}</div>
+      <div class="result-info ${r.danger?'warn-line':''}">被ダメ: <strong>${defLbl}</strong>（最大x${r.defWorst.toFixed(2)}）${r.danger?`／相手のタイプ攻撃で x${r.enemyDmg.toFixed(2)} 被弾`:''}</div>
       <div class="score-bar"><div class="score-fill" style="width:${pct}%;background:${barColor}"></div></div>
     </div>`;
   }).join('');
@@ -1502,9 +1817,20 @@ function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);}
 
+function buildWeatherSel(){
+  const s=document.getElementById('weather-sel');if(!s)return;
+  s.innerHTML='<option value="">なし</option>';
+  Object.keys(WEATHER).forEach(k=>{
+    const o=document.createElement('option');o.value=k;
+    o.textContent=WEATHER[k].label+'（'+WEATHER[k].types.join('・')+'）';
+    s.appendChild(o);
+  });
+}
+
 buildGrid('enemy-grid',enemyTypes,2,()=>{renderEnemyTags();renderBattle();});
+buildWeatherSel();
 buildMoveSel();
-buildGrid('my-type-grid',mySelTypes,2,()=>{});
+buildGrid('my-type-grid',mySelTypes,2,renderStabSuggest);
 renderDecks();
 </script>
 </body>
