@@ -114,7 +114,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
 .deck-card { background: var(--bg); border: 1px solid var(--sep); border-radius: var(--r-lg); margin-bottom: 10px; box-shadow: var(--sh-sm); overflow: hidden; }
 .deck-card-header { display: flex; align-items: center; gap: 8px; padding: 14px 16px; border-bottom: 1px solid var(--sep); }
 .deck-card-header.collapsed { border-bottom: none; }
-.deck-toggle { flex: 1; display: flex; align-items: center; gap: 9px; cursor: pointer; min-width: 0; background: none; border: none; text-align: left; padding: 4px 0; font-family: var(--font); }
+.deck-toggle { flex: 1; display: flex; align-items: center; gap: 9px; cursor: pointer; min-width: 0; background: none; border: none; text-align: left; padding: 4px 0; font-family: var(--font); color: inherit; -webkit-appearance: none; appearance: none; }
 .deck-toggle:active { opacity: 0.55; }
 .deck-chevron { color: var(--label3); flex-shrink: 0; transition: transform .22s cubic-bezier(0.4,0,0.2,1); }
 .deck-chevron.open { transform: rotate(90deg); }
@@ -1961,13 +1961,13 @@ function renderDecks(){
             <button class="reorder-btn" onclick="moveDeck('${deck.id}',-1)" ${dIdx===0?'disabled':''} aria-label="デッキを上へ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button>
             <button class="reorder-btn" onclick="moveDeck('${deck.id}',1)" ${dIdx===data.decks.length-1?'disabled':''} aria-label="デッキを下へ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
           </div>`:''}
-          <div class="deck-toggle" onclick="toggleDeck('${deck.id}')">
+          <button type="button" class="deck-toggle" onclick="toggleDeck('${deck.id}')">
             <svg class="deck-chevron${collapsed?'':' open'}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
             <div style="min-width:0">
               <div class="deck-card-name">${esc(deck.name)}</div>
               <div class="deck-card-count">${total}体${deckSearch?` / ${visible.length}体該当`:'登録済み'}${collapsed?'・タップで開く':''}</div>
             </div>
-          </div>
+          </button>
           <div class="deck-card-actions">
             <button class="btn-sm" onclick="openAddPoke('${deck.id}')">＋ 追加</button>
             <button class="btn-sm" onclick="openEditDeck('${deck.id}')">編集</button>
