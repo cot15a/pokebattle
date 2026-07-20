@@ -1874,13 +1874,13 @@ function renderBattle(){
       const mult=raw*wb;
       if(mult>bestMult){bestMult=mult;bestRaw=raw;bestMove=m;bestBoosted=wb>1;}
     });
-    let defWorst=1;TYPES.forEach(t=>{const m=atkMult(t,p.types);if(m>defWorst)defWorst=m;});
-    // 逆引き：相手タイプの攻撃でどれだけ被弾するか（タイプ一致技を想定）
+    // この相手のタイプ攻撃で受ける最大倍率（＝この対面での打たれ強さ。相手が持つタイプのみで判定）
     let enemyDmg=0;enemyTypes.forEach(et=>{const m=atkMult(et,p.types);if(m>enemyDmg)enemyDmg=m;});
     const danger=enemyDmg>=1.6;
     const stab=bestMove&&p.types.includes(bestMove.type)?0.2:0;
-    const score=bestMult*(1+stab)*(1/Math.max(defWorst,0.5))*(danger?0.75:1);
-    return{p,bestMult,bestRaw,bestMove,bestBoosted,defWorst,enemyDmg,danger,stab,score};
+    // 攻撃（相手への有効度＋タイプ一致）× 防御（この相手からの被弾で補正）。被弾の減点は1項に統一
+    const score=bestMult*(1+stab)*(1/Math.max(enemyDmg,0.5));
+    return{p,bestMult,bestRaw,bestMove,bestBoosted,enemyDmg,danger,stab,score};
   }).sort((a,b)=>b.score-a.score);
   const maxScore=results[0].score||1;
   // おすすめ3体パーティ（弱点が偏らないよう分散選出）
@@ -1928,7 +1928,7 @@ function renderBattle(){
     else{rank='C';rClass='r-c';cardClass='result-bad';}
     if(r.danger)cardClass=(cardClass+' result-danger').trim();
     const atkLbl=r.bestRaw>=2.56?'2重バツグン x2.56':r.bestRaw>=1.6?'バツグン x1.6':r.bestRaw<0.625?'イマイチ':'等倍';
-    const defLbl=r.defWorst>=2.56?'▲ 2重弱点あり':r.defWorst>=1.6?'△ 弱点あり':r.defWorst<=0.625?'◎ 耐性あり':'— 等倍';
+    const defLbl=r.enemyDmg>=2.56?'▲ 2重弱点を突かれる':r.enemyDmg>=1.6?'△ 弱点を突かれる':r.enemyDmg<=0.625?'◎ 半減できる':'— 等倍';
     const stab=r.stab>0?' (タイプ一致)':'';
     const barColor=rank==='S'?'#ff3b30':rank==='A'?'#ff9500':rank==='B'?'#0071e3':'#c7c7cc';
     const wTag=r.bestBoosted?` <span class="weather-boost-tag">▲天候ブースト x1.2</span>`:'';
@@ -1941,7 +1941,7 @@ function renderBattle(){
       </div>
       <div class="poke-types-row" style="margin-bottom:6px">${r.p.types.map(t=>`<span class="ptag" style="background:${TC[t]}">${t}</span>`).join('')}</div>
       <div class="result-info">最強技: <strong>${r.bestMove?r.bestMove.name:'—'}</strong> → <strong>${atkLbl}</strong>${stab}${wTag}</div>
-      <div class="result-info ${r.danger?'warn-line':''}">被ダメ: <strong>${defLbl}</strong>（最大x${r.defWorst.toFixed(2)}）${r.danger?`／相手のタイプ攻撃で x${r.enemyDmg.toFixed(2)} 被弾`:''}</div>
+      <div class="result-info ${r.danger?'warn-line':''}">相手の攻撃: <strong>${defLbl}</strong>（最大x${r.enemyDmg.toFixed(2)}）</div>
       <div class="score-bar"><div class="score-fill" style="width:${pct}%;background:${barColor}"></div></div>
     </div>`;
   }).join('');
