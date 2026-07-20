@@ -290,6 +290,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
   .result-best { background: rgba(255,69,58,0.13); }
   .result-good { background: rgba(255,159,10,0.13); }
   .err-box { background: rgba(255,69,58,0.13); }
+  .party-block { border-color: rgba(10,132,255,0.3); }
 }
 </style>
 </head>
@@ -374,7 +375,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
     <div class="modal-handle"></div>
     <div class="modal-header">
       <span class="modal-title" id="modal-deck-title">デッキを追加</span>
-      <button class="modal-close" onclick="closeModal('modal-deck')">完了</button>
+      <button class="modal-close" onclick="closeModal('modal-deck')">キャンセル</button>
     </div>
     <div class="modal-body">
       <label class="modal-lbl">デッキ名</label>
@@ -390,7 +391,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
     <div class="modal-handle"></div>
     <div class="modal-header">
       <span class="modal-title" id="modal-poke-title">ポケモンを追加</span>
-      <button class="modal-close" onclick="closeModal('modal-poke')">完了</button>
+      <button class="modal-close" onclick="closeModal('modal-poke')">キャンセル</button>
     </div>
     <div class="modal-body">
       <label class="modal-lbl">名前</label>
@@ -1982,7 +1983,7 @@ function renderBattle(){
         <span class="order-num${orderClass}">${idx+1}</span>
         <span class="rank-badge ${rClass}">${rank}</span>
         <span class="result-name">${esc(r.p.name)}</span>
-        ${idx===0?'<span class="best-tag">おすすめ</span>':dangerBadge?`<span style="margin-left:auto">${dangerBadge}</span>`:''}
+        ${(idx===0||r.danger)?`<span style="margin-left:auto;display:inline-flex;gap:6px;align-items:center">${r.danger?dangerBadge:''}${idx===0?'<span class="best-tag" style="margin:0">おすすめ</span>':''}</span>`:''}
       </div>
       <div class="poke-types-row" style="margin-bottom:6px">${r.p.types.map(t=>`<span class="ptag" style="background:${TC[t]}">${t}</span>`).join('')}</div>
       <div class="result-info">最強技: <strong>${r.bestMove?esc(r.bestMove.name):'—'}</strong> → <strong>${atkLbl}</strong>${stab}${wTag}</div>
