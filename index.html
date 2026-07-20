@@ -248,6 +248,15 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
 .copy-deck-nm { font-size: 14px; font-weight: 600; color: var(--label); }
 .copy-deck-ct { font-size: 12px; color: var(--label2); }
 
+/* デッキ弱点診断 */
+.deck-diag { display: flex; align-items: flex-start; gap: 8px; padding: 9px 16px; background: var(--bg2); border-bottom: 1px solid var(--sep); }
+.deck-diag-lbl { font-size: 11px; font-weight: 700; color: var(--label2); flex-shrink: 0; padding-top: 3px; width: 62px; }
+.deck-diag-pills { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; }
+.ddp { padding: 3px 9px; border-radius: 6px; font-size: 11px; font-weight: 600; color: #fff; display: inline-flex; align-items: center; gap: 4px; }
+.ddp-ct { font-size: 10px; opacity: 0.9; font-weight: 700; }
+.ddp-danger { box-shadow: 0 0 0 2px var(--red); }
+.deck-diag-ok { font-size: 11px; color: var(--green); font-weight: 600; padding-top: 3px; }
+
 /* ダークモード */
 @media (prefers-color-scheme: dark) {
   :root {
@@ -310,6 +319,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
         <button class="btn-ghost" onclick="document.getElementById('import-file').click()">データを読み込む</button>
         <input type="file" id="import-file" accept="application/json,.json" class="hidden" onchange="importData(event)">
       </div>
+      <button class="btn-ghost" onclick="addSampleDeck()" style="margin-bottom:14px">最強サンプルデッキを追加</button>
       <div id="deck-list"></div>
     </div>
     <div id="sec-battle" class="content-wrap page-in hidden">
@@ -1370,6 +1380,41 @@ let weather='',deckSearch='',deckSort='order',copyPokeSrc=null;
 // edit state
 let editDeckId=null,editPokeId=null,editDeckContext=null;
 
+/* ---- 最強サンプルデッキ（高火力・広い攻撃範囲・弱点が偏りにくい6体）---- */
+const SAMPLE_DECK={
+  name:'最強サンプルデッキ',
+  pokemons:[
+    {name:'メタグロス',types:['はがね','エスパー'],moves:[{type:'はがね',name:'コメットパンチ'},{type:'エスパー',name:'サイコキネシス'}]},
+    {name:'カイリュー',types:['ドラゴン','ひこう'],moves:[{type:'ドラゴン',name:'げきりん'},{type:'ひこう',name:'ぼうふう'}]},
+    {name:'バンギラス',types:['いわ','あく'],moves:[{type:'あく',name:'かみくだく'},{type:'いわ',name:'ストーンエッジ'}]},
+    {name:'カイオーガ',types:['みず'],moves:[{type:'みず',name:'ハイドロカノン'},{type:'こおり',name:'ふぶき'}]},
+    {name:'ガブリアス',types:['ドラゴン','じめん'],moves:[{type:'じめん',name:'じしん'},{type:'ドラゴン',name:'げきりん'}]},
+    {name:'ルカリオ',types:['かくとう','はがね'],moves:[{type:'かくとう',name:'インファイト'},{type:'はがね',name:'ラスターカノン'}]}
+  ]
+};
+function addSampleDeck(){
+  data.decks.push({
+    id:uid(),
+    name:SAMPLE_DECK.name,
+    pokemons:SAMPLE_DECK.pokemons.map(p=>({id:uid(),name:p.name,types:[...p.types],moves:p.moves.map(m=>({...m}))}))
+  });
+  save();renderDecks();
+}
+
+/* ---- デッキ弱点診断（チーム全体で共通して弱いタイプを可視化）---- */
+function deckDiagHtml(deck){
+  const n=deck.pokemons.length;
+  const cnt={};TYPES.forEach(t=>cnt[t]=0);
+  deck.pokemons.forEach(p=>{TYPES.forEach(t=>{if(atkMult(t,p.types)>=1.6)cnt[t]++;});});
+  const thr=Math.max(2,Math.ceil(n/2));
+  const shared=TYPES.filter(t=>cnt[t]>=thr).sort((a,b)=>cnt[b]-cnt[a]);
+  if(!shared.length){
+    return `<div class="deck-diag"><span class="deck-diag-lbl">チーム弱点</span><span class="deck-diag-ok">◎ 共通の弱点なし（バランス良好）</span></div>`;
+  }
+  const pills=shared.slice(0,6).map(t=>`<span class="ddp ddp-danger" style="background:${TC[t]}">${t}<span class="ddp-ct">${cnt[t]}/${n}</span></span>`).join('');
+  return `<div class="deck-diag"><span class="deck-diag-lbl">チーム弱点</span><span class="deck-diag-pills">${pills}</span></div>`;
+}
+
 function save(){localStorage.setItem('pokebattle_v3',JSON.stringify(data));}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
 
@@ -1754,6 +1799,7 @@ function renderDecks(){
     if(deckSort==='name')visible=[...visible].sort((a,b)=>a.name.localeCompare(b.name,'ja'));
     if(deckSearch && !visible.length)return '';
     const lastIdx=total-1;
+    const diagHtml=total>=2?deckDiagHtml(deck):'';
     return `
     <div class="page-in">
       <div class="grp-label">${deck.name}</div>
@@ -1769,6 +1815,7 @@ function renderDecks(){
             <button class="btn-sm btn-sm-red" onclick="deleteDeck('${deck.id}')">削除</button>
           </div>
         </div>
+        ${diagHtml}
         ${total===0
           ?`<div style="padding:16px;color:var(--label3);font-size:14px;text-align:center">ポケモンを追加してください</div>`
           :visible.map(p=>{
@@ -1927,6 +1974,7 @@ buildGrid('enemy-grid',enemyTypes,2,onEnemyChange);
 buildWeatherSel();
 buildMoveSel();
 buildGrid('my-type-grid',mySelTypes,2,renderStabSuggest);
+if(!data.decks.length)addSampleDeck();  // 初回のみ最強サンプルデッキを投入
 renderDecks();
 
 /* PWA: Service Worker 登録（http(s)配信時のみ有効。file://では無視される）*/
