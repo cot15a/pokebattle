@@ -1380,9 +1380,37 @@ const WEATHER={
 };
 const WEATHER_BOOST=1.2;
 
-let data=JSON.parse(localStorage.getItem('pokebattle_v3')||'{"decks":[]}');
+let data;
+try{
+  data=JSON.parse(localStorage.getItem('pokebattle_v3')||'{"decks":[]}');
+  if(!data||typeof data!=='object'||!Array.isArray(data.decks))throw new Error('invalid');
+}catch(e){
+  data={decks:[]};
+  try{alert('保存データが読み込めなかったため、空の状態で起動しました。');}catch(_){}
+}
+// HTMLエスケープ（ユーザーが入力した名前を安全に表示する）
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+// インポート等で入る不正データを整形（欠けている項目を補い、無効なタイプ/技を除去）
+function normalizeData(d){
+  const out={decks:[],seeded:d&&d.seeded?true:undefined};
+  const decks=(d&&Array.isArray(d.decks))?d.decks:[];
+  decks.forEach(dk=>{
+    if(!dk||typeof dk!=='object')return;
+    const deck={id:dk.id||uid(),name:typeof dk.name==='string'&&dk.name?dk.name:'無名デッキ',pokemons:[]};
+    const mons=Array.isArray(dk.pokemons)?dk.pokemons:[];
+    mons.forEach(p=>{
+      if(!p||typeof p!=='object')return;
+      const types=(Array.isArray(p.types)?p.types:[]).filter(t=>TYPES.includes(t));
+      const moves=(Array.isArray(p.moves)?p.moves:[]).filter(m=>m&&TYPES.includes(m.type))
+        .map(m=>({type:m.type,name:typeof m.name==='string'&&m.name?m.name:m.type+'わざ'}));
+      deck.pokemons.push({id:p.id||uid(),name:typeof p.name==='string'&&p.name?p.name:'？',types,moves});
+    });
+    out.decks.push(deck);
+  });
+  return out;
+}
 let mySelTypes=[],myMoves=[],enemyTypes=[],activeDeckId=null;
-let weather='',deckSearch='',deckSort='order',copyPokeSrc=null;
+let weather='',deckSearch='',deckSort='order',copyPokeSrc=null,enemyPick=false;
 // edit state
 let editDeckId=null,editPokeId=null,editDeckContext=null;
 
@@ -1464,7 +1492,7 @@ function renderMovePrev(){
   const el=document.getElementById('move-preview');if(!el)return;
   el.innerHTML=myMoves.map((m,i)=>`
     <span class="mchip" style="background:${TC[m.type]}14;color:${TC[m.type]};border-color:${TC[m.type]}44" onclick="removeMove(${i})">
-      ${m.name}<span class="mchip-x">x</span>
+      ${esc(m.name)}<span class="mchip-x">x</span>
     </span>`).join('');
 }
 function removeMove(i){myMoves.splice(i,1);renderMovePrev();}
@@ -1561,6 +1589,7 @@ function pickEnemy(i){
   document.getElementById('enemy-name-inp').value=p.name;
   enemyTypes.length=0;
   p.types.slice(0,2).forEach(t=>enemyTypes.push(t));
+  enemyPick=true;  // 名前から選んだ場合は入力欄を消さない
   buildGrid('enemy-grid',enemyTypes,2,onEnemyChange);
   onEnemyChange();
   hideEnemyAc();
@@ -1570,6 +1599,9 @@ function hideEnemyAc(){
   if(box){box.classList.add('hidden');box.innerHTML='';}
 }
 function onEnemyChange(){
+  // タイプを手動で変更した時は、ズレを防ぐため相手ポケモン名の入力欄を空にする
+  if(!enemyPick){const ni=document.getElementById('enemy-name-inp');if(ni)ni.value='';}
+  enemyPick=false;
   renderEnemyTags();renderEnemySummary();updateEnemyClearBtn();renderBattle();
 }
 function updateEnemyClearBtn(){
@@ -1642,7 +1674,7 @@ function importData(ev){
       const parsed=JSON.parse(e.target.result);
       if(!parsed||!Array.isArray(parsed.decks))throw new Error('形式が不正です');
       if(!confirm('現在のデータを読み込んだ内容で置き換えます。よろしいですか？')){ev.target.value='';return;}
-      data=parsed;
+      data=normalizeData(parsed);  // 欠けた項目を補い、不正なタイプ/技を除去して安全化
       activeDeckId=null;
       save();renderDecks();renderDeckPicker();renderBattle();
       alert('データを読み込みました');
@@ -1681,7 +1713,7 @@ function openCopyPoke(deckId,pokeId){
   } else {
     list.innerHTML=others.map(d=>`
       <div class="copy-deck-item" onclick="doCopyPoke('${d.id}')">
-        <span class="copy-deck-nm">${d.name}</span>
+        <span class="copy-deck-nm">${esc(d.name)}</span>
         <span class="copy-deck-ct">${d.pokemons.length}体</span>
       </div>`).join('');
   }
@@ -1808,11 +1840,11 @@ function renderDecks(){
     const diagHtml=total>=2?deckDiagHtml(deck):'';
     return `
     <div class="page-in">
-      <div class="grp-label">${deck.name}</div>
+      <div class="grp-label">${esc(deck.name)}</div>
       <div class="deck-card">
         <div class="deck-card-header">
           <div>
-            <div class="deck-card-name">${deck.name}</div>
+            <div class="deck-card-name">${esc(deck.name)}</div>
             <div class="deck-card-count">${total}体登録済み${deckSearch?` / ${visible.length}体該当`:''}</div>
           </div>
           <div class="deck-card-actions">
@@ -1833,9 +1865,9 @@ function renderDecks(){
                 <button class="reorder-btn" onclick="movePoke('${deck.id}','${p.id}',1)" ${idx===lastIdx?'disabled':''} aria-label="下へ"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
               </div>`:''}
               <div style="flex:1;min-width:0">
-                <div class="poke-name-sm">${p.name}</div>
+                <div class="poke-name-sm">${esc(p.name)}</div>
                 <div class="poke-types-row">${p.types.map(t=>`<span class="ptag" style="background:${TC[t]}">${t}</span>`).join('')}</div>
-                <div class="poke-moves-sm">技: ${p.moves.map(m=>`<span style="color:${TC[m.type]};font-weight:600">${m.name}</span>`).join('・')}</div>
+                <div class="poke-moves-sm">技: ${p.moves.map(m=>`<span style="color:${TC[m.type]};font-weight:600">${esc(m.name)}</span>`).join('・')}</div>
               </div>
               <div class="poke-act-row">
                 <button class="btn-sm" onclick="openEditPoke('${deck.id}','${p.id}')">編集</button>
@@ -1846,14 +1878,14 @@ function renderDecks(){
       </div>
     </div>`;
   }).join('');
-  el.innerHTML=rows || `<div class="empty-state page-in"><div class="empty-title">該当なし</div><div class="empty-sub">「${deckSearch}」に一致するポケモンはいません</div></div>`;
+  el.innerHTML=rows || `<div class="empty-state page-in"><div class="empty-title">該当なし</div><div class="empty-sub">「${esc(deckSearch)}」に一致するポケモンはいません</div></div>`;
 }
 
 function renderDeckPicker(){
   const el=document.getElementById('deck-picker');if(!el)return;
   if(!data.decks.length){el.innerHTML='<span style="color:var(--label3);font-size:14px">まず手持ちタブでデッキを作成してください</span>';return;}
   el.innerHTML=data.decks.map(d=>`
-    <span class="deck-chip${activeDeckId===d.id?' active':''}" onclick="selectDeck('${d.id}')">${d.name}</span>`).join('');
+    <span class="deck-chip${activeDeckId===d.id?' active':''}" onclick="selectDeck('${d.id}')">${esc(d.name)}</span>`).join('');
 }
 function selectDeck(id){activeDeckId=id;renderDeckPicker();renderBattle();}
 
@@ -1880,8 +1912,8 @@ function renderBattle(){
       const mult=raw*wb;
       if(mult>bestMult){bestMult=mult;bestRaw=raw;bestMove=m;bestBoosted=wb>1;}
     });
-    // この相手のタイプ攻撃で受ける最大倍率（＝この対面での打たれ強さ。相手が持つタイプのみで判定）
-    let enemyDmg=0;enemyTypes.forEach(et=>{const m=atkMult(et,p.types);if(m>enemyDmg)enemyDmg=m;});
+    // この相手のタイプ攻撃で受ける最大倍率（＝この対面での打たれ強さ。天候ブーストは相手の攻撃にも適用）
+    let enemyDmg=0;enemyTypes.forEach(et=>{const m=atkMult(et,p.types)*weatherBonus(et);if(m>enemyDmg)enemyDmg=m;});
     const danger=enemyDmg>=1.6;
     const stab=bestMove&&p.types.includes(bestMove.type)?0.2:0;
     // 攻撃（相手への有効度＋タイプ一致）× 防御（この相手からの被弾で補正）。被弾の減点は1項に統一
@@ -1919,7 +1951,7 @@ function renderBattle(){
           return `
           <div class="party-member">
             <div class="party-slot">${i+1}番手</div>
-            <div class="party-name">${r.p.name}</div>
+            <div class="party-name">${esc(r.p.name)}</div>
             <div class="party-types">${r.p.types.map(t=>`<span class="ptag" style="background:${TC[t]}">${t}</span>`).join('')}</div>
             <div class="party-weak">弱点 ${wk.length?wk.map(t=>`<span style="color:${TC[t]}">${t}</span>`).join('・'):'なし'}</div>
           </div>`;}).join('')}
@@ -1949,11 +1981,11 @@ function renderBattle(){
       <div class="result-header">
         <span class="order-num${orderClass}">${idx+1}</span>
         <span class="rank-badge ${rClass}">${rank}</span>
-        <span class="result-name">${r.p.name}</span>
+        <span class="result-name">${esc(r.p.name)}</span>
         ${idx===0?'<span class="best-tag">おすすめ</span>':dangerBadge?`<span style="margin-left:auto">${dangerBadge}</span>`:''}
       </div>
       <div class="poke-types-row" style="margin-bottom:6px">${r.p.types.map(t=>`<span class="ptag" style="background:${TC[t]}">${t}</span>`).join('')}</div>
-      <div class="result-info">最強技: <strong>${r.bestMove?r.bestMove.name:'—'}</strong> → <strong>${atkLbl}</strong>${stab}${wTag}</div>
+      <div class="result-info">最強技: <strong>${r.bestMove?esc(r.bestMove.name):'—'}</strong> → <strong>${atkLbl}</strong>${stab}${wTag}</div>
       <div class="result-info ${r.danger?'warn-line':''}">相手の攻撃: <strong>${defLbl}</strong>（最大x${r.enemyDmg.toFixed(2)}）</div>
       <div class="score-bar"><div class="score-fill" style="width:${pct}%;background:${barColor}"></div></div>
     </div>`;
