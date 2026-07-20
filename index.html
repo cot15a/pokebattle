@@ -139,7 +139,13 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
 .result-good { background: #fffbf0; border-color: rgba(255,149,0,0.25); }
 .result-bad { opacity: 0.55; }
 .result-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.rank-badge { padding: 3px 10px; border-radius: var(--r-sm); font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.order-num { min-width: 24px; height: 24px; padding: 0 7px; border-radius: 12px; background: var(--bg3); color: var(--label2); border: 1px solid var(--sep); font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.order-1 { background: var(--red); color: #fff; border-color: transparent; }
+.order-2 { background: var(--orange); color: #fff; border-color: transparent; }
+.order-3 { background: var(--blue); color: #fff; border-color: transparent; }
+.result-legend { font-size: 11px; color: var(--label2); line-height: 1.6; background: var(--bg2); border: 1px solid var(--sep); border-radius: var(--r-md); padding: 9px 12px; margin-bottom: 10px; }
+.result-legend b { color: var(--label); font-weight: 700; }
+.rank-badge { padding: 3px 9px; border-radius: var(--r-sm); font-size: 12px; font-weight: 700; flex-shrink: 0; }
 .r-s { background: var(--red); color: #fff; }
 .r-a { background: var(--orange); color: #fff; }
 .r-b { background: var(--blue); color: #fff; }
@@ -1475,7 +1481,7 @@ function renderStabSuggest(){
 }
 function addStabMove(t){
   if(!TYPES.includes(t))return;
-  myMoves.push({type:t,name:t+'技'});
+  myMoves.push({type:t,name:t+'わざ'});
   renderMovePrev();renderStabSuggest();
 }
 function showErr(id,msg){const e=document.getElementById(id);if(!e)return;e.textContent=msg;e.classList.remove('hidden');}
@@ -1919,14 +1925,20 @@ function renderBattle(){
           </div>`;}).join('')}
       </div>
     </div>`:'';
-  el.innerHTML=partyHtml+results.map((r,idx)=>{
+  const legend=`<div class="result-legend"><b>数字</b> = 総合おすすめ順位（攻撃＋タイプ一致＋守りで判定）　／　<b>S・A・B・C</b> = 攻撃の効きやすさ。<br>攻撃が普通でも「相手に強い（半減できる）」ポケモンは上位に来ることがあります。</div>`;
+  el.innerHTML=partyHtml+legend+results.map((r,idx)=>{
     const pct=Math.round((r.score/maxScore)*100);
-    let rank,rClass,cardClass;
-    if(r.bestRaw>=2.56){rank='S';rClass='r-s';cardClass=idx===0?'result-best':'result-good';}
-    else if(r.bestRaw>=1.6){rank='A';rClass='r-a';cardClass=idx===0?'result-best':'result-good';}
-    else if(r.bestRaw>=1.0){rank='B';rClass='r-b';cardClass='';}
-    else{rank='C';rClass='r-c';cardClass='result-bad';}
+    // 攻撃ランク（S/A/B/C）は「技の効きやすさ」を表す
+    let rank,rClass;
+    if(r.bestRaw>=2.56){rank='S';rClass='r-s';}
+    else if(r.bestRaw>=1.6){rank='A';rClass='r-a';}
+    else if(r.bestRaw>=1.0){rank='B';rClass='r-b';}
+    else{rank='C';rClass='r-c';}
+    // カードの強調は「総合順位」で決める（1位=強調、上位3=淡く強調、スコアが低い候補は控えめ）
+    let cardClass=idx===0?'result-best':idx<3?'result-good':'';
+    if(idx>=3 && pct<45)cardClass='result-bad';
     if(r.danger)cardClass=(cardClass+' result-danger').trim();
+    const orderClass=idx<3?` order-${idx+1}`:'';
     const atkLbl=r.bestRaw>=2.56?'2重バツグン x2.56':r.bestRaw>=1.6?'バツグン x1.6':r.bestRaw<0.625?'イマイチ':'等倍';
     const defLbl=r.enemyDmg>=2.56?'▲ 2重弱点を突かれる':r.enemyDmg>=1.6?'△ 弱点を突かれる':r.enemyDmg<=0.625?'◎ 半減できる':'— 等倍';
     const stab=r.stab>0?' (タイプ一致)':'';
@@ -1935,6 +1947,7 @@ function renderBattle(){
     const dangerBadge=r.danger?`<span class="danger-badge">▲ 弱点注意</span>`:'';
     return`<div class="result-card ${cardClass} page-in">
       <div class="result-header">
+        <span class="order-num${orderClass}">${idx+1}</span>
         <span class="rank-badge ${rClass}">${rank}</span>
         <span class="result-name">${r.p.name}</span>
         ${idx===0?'<span class="best-tag">おすすめ</span>':dangerBadge?`<span style="margin-left:auto">${dangerBadge}</span>`:''}
@@ -1974,7 +1987,11 @@ buildGrid('enemy-grid',enemyTypes,2,onEnemyChange);
 buildWeatherSel();
 buildMoveSel();
 buildGrid('my-type-grid',mySelTypes,2,renderStabSuggest);
-if(!data.decks.length)addSampleDeck();  // 初回のみ最強サンプルデッキを投入
+// 初回だけ最強サンプルデッキを投入（一度出したら記録し、以後は空でも自動投入しない）
+if(!data.seeded){
+  data.seeded=true;
+  if(!data.decks.length)addSampleDeck(); else save();
+}
 renderDecks();
 
 /* PWA: Service Worker 登録（http(s)配信時のみ有効。file://では無視される）*/
