@@ -118,17 +118,17 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
 .deck-toggle:active { opacity: 0.55; }
 .deck-chevron { color: var(--label3); flex-shrink: 0; transition: transform .22s cubic-bezier(0.4,0,0.2,1); }
 .deck-chevron.open { transform: rotate(90deg); }
-.deck-card-name { font-size: 15px; font-weight: 700; color: var(--label); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.deck-card-name { font-size: 15px; font-weight: 700; color: var(--label); overflow-wrap: anywhere; word-break: break-word; }
 .deck-card-count { font-size: 12px; color: var(--label2); margin-top: 2px; }
 .deck-card-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
 
 .poke-row { display: flex; align-items: center; padding: 11px 16px; border-bottom: 1px solid var(--sep); gap: 10px; transition: background .15s; }
 .poke-row:last-child { border-bottom: none; }
 .poke-row:active { background: var(--bg2); }
-.poke-name-sm { font-size: 14px; font-weight: 600; color: var(--label); }
+.poke-name-sm { font-size: 14px; font-weight: 600; color: var(--label); overflow-wrap: anywhere; word-break: break-word; }
 .poke-types-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
 .ptag { padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; color: #fff; }
-.poke-moves-sm { font-size: 11px; color: var(--label2); margin-top: 3px; }
+.poke-moves-sm { font-size: 11px; color: var(--label2); margin-top: 3px; overflow-wrap: anywhere; word-break: break-word; }
 
 .deck-picker { display: flex; gap: 6px; flex-wrap: wrap; }
 .deck-chip { padding: 8px 16px; border-radius: 980px; font-size: 13px; font-weight: 600; cursor: pointer; background: var(--bg); color: var(--label2); border: 1px solid var(--sep); box-shadow: var(--sh-sm); transition: all .15s; }
@@ -143,7 +143,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
 .result-best { background: #fff5f5; border-color: rgba(255,59,48,0.25); }
 .result-good { background: #fffbf0; border-color: rgba(255,149,0,0.25); }
 .result-bad { opacity: 0.55; }
-.result-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.result-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; row-gap: 4px; }
 .order-num { min-width: 24px; height: 24px; padding: 0 7px; border-radius: 12px; background: var(--bg3); color: var(--label2); border: 1px solid var(--sep); font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .order-1 { background: var(--red); color: #fff; border-color: transparent; }
 .order-2 { background: var(--orange); color: #fff; border-color: transparent; }
@@ -156,7 +156,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
 .r-b { background: var(--blue); color: #fff; }
 .r-c { background: var(--bg3); color: var(--label3); border: 1px solid var(--sep); }
 .best-tag { margin-left: auto; padding: 3px 10px; border-radius: var(--r-sm); background: var(--red); color: #fff; font-size: 11px; font-weight: 700; }
-.result-name { font-size: 16px; font-weight: 700; color: var(--label); }
+.result-name { font-size: 16px; font-weight: 700; color: var(--label); flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
 .result-info { font-size: 12px; color: var(--label2); margin-top: 4px; line-height: 1.65; }
 .result-info strong { color: var(--label); font-weight: 600; }
 .score-bar { height: 4px; border-radius: 2px; background: var(--bg3); margin-top: 10px; overflow: hidden; }
@@ -235,7 +235,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
 .party-block { background: linear-gradient(135deg, var(--blue-l), transparent); border: 1px solid rgba(0,113,227,0.22); border-radius: var(--r-lg); padding: 14px 16px; margin-bottom: 14px; box-shadow: var(--sh-sm); }
 .party-title { font-size: 13px; font-weight: 700; color: var(--blue); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
 .party-members { display: flex; gap: 8px; }
-.party-member { flex: 1; background: var(--bg); border: 1px solid var(--sep); border-radius: var(--r-md); padding: 10px 8px; text-align: center; box-shadow: var(--sh-sm); }
+.party-member { flex: 1; min-width: 0; background: var(--bg); border: 1px solid var(--sep); border-radius: var(--r-md); padding: 10px 8px; text-align: center; box-shadow: var(--sh-sm); }
 .party-slot { font-size: 10px; font-weight: 700; color: var(--label3); margin-bottom: 4px; }
 .party-name { font-size: 13px; font-weight: 700; color: var(--label); line-height: 1.3; word-break: break-word; }
 .party-types { display: flex; gap: 3px; justify-content: center; flex-wrap: wrap; margin-top: 5px; }
@@ -314,6 +314,20 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg3); -we
   .result-good { background: rgba(255,159,10,0.13); }
   .err-box { background: rgba(255,69,58,0.13); }
   .party-block { border-color: rgba(10,132,255,0.3); }
+}
+
+/* 狭い画面（iPhone SE など）：ボタンや余白を詰めて文字の場所を確保 */
+@media (max-width: 390px) {
+  .content-wrap { padding: 16px 12px 0; }
+  .apple-card { padding: 14px; }
+  .btn-sm { padding: 7px 11px; font-size: 12px; }
+  .poke-row { padding: 11px 12px; gap: 8px; }
+  .deck-card-header { padding: 12px; gap: 6px; }
+  .deck-card-actions { gap: 5px; }
+  .poke-act-row { gap: 4px; }
+  .party-members { gap: 6px; }
+  .party-member { padding: 9px 5px; }
+  .result-card { padding: 13px 13px; }
 }
 </style>
 </head>
